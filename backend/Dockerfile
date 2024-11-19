@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # FastAPI 애플리케이션 실행 포트 설정 (ECS에서는 8000 사용)
-EXPOSE 8000
+EXPOSE 8020
 
 # FastAPI 서버 실행
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8020"]
