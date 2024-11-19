@@ -34,7 +34,7 @@ class SpecificationsBase(BaseModel):
 # Health Check 엔드포인트 추가
 @app.get("/health")
 async def health_check():
-    return {"status": "ok"}
+    return "ok"
 
 # 세션 생성 함수
 async def get_db():
