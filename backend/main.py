@@ -36,7 +36,6 @@ class SpecificationsBase(BaseModel):
 async def health_check():
     return {"status": "ok"}
 
-
 # 세션 생성 함수
 async def get_db():
     async with AsyncSessionLocal() as session:
