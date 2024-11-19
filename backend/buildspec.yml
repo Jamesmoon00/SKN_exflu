@@ -27,7 +27,7 @@ phases:
     commands:
       - echo Build started on `date`
       # 프로젝트 폴더로 이동 
-      #- cd ./frontend
+      - cd ./backend
       - pwd
       - echo Building the Docker image...
       # Github Repository에 있는 Dockerfile의 위치에 맞춰 수정 
