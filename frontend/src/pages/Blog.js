@@ -13,17 +13,16 @@ const Blog = () => {
             </div>
 
             {/* 오른쪽 게시글 리스트 */}
-            {/* <div style={styles.blogList}>
+            <div style={styles.blogList}>
                 <div style={styles.blogHeader}>
                     <p style={styles.postCount}>목록</p>
                     <div style={styles.postHeader}>
-                        <span style={styles.postNum}>번호</span>
-                        <span style={styles.postTitle}>글 제목</span>
-                        <span style={styles.postDate}>작성일</span>
+                        <span>글 제목</span>
+                        <span>작성일</span>
                     </div>
                 </div>
-            </div> */}
-            <Write />
+            </div>
+            {/* <Write /> */}
         </div> // 모든 내용을 하나의 최상위 요소로 감쌈
     );
 };
@@ -33,7 +32,7 @@ const Blog = () => {
 const styles = {
     container: {
         display: "flex",
-        padding: "40px",
+        // padding: "20px",
         backgroundColor: "#fffaea",
         height: "100vh",
         // boxSizing: "border-box",
@@ -43,7 +42,7 @@ const styles = {
         // flex: "1",
         backgroundColor: "#fffdf7",
         borderRadius: "10px",
-        padding: "40px",
+        padding: "30px",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         textAlign: "center",
         marginBottom: "30px"
@@ -69,7 +68,7 @@ const styles = {
         color: "#555",
     },
     blogList: {
-        flex: "2.5",
+        flex: "3",
         marginLeft: "40px",
         width: "100%"
     },
@@ -86,22 +85,9 @@ const styles = {
     },
     postHeader: {
         display: "flex",
-        alignItems:"center",
-        // justifyContent: "space-between",
+        justifyContent: "space-between",
         fontSize: "0.9rem",
         color: "#555",
-    },
-    postNum: {
-        flex :"1",
-        textAlign: "left"
-    },
-    postTitle: {
-        flex: "5",
-        textAlign: "left", // 텍스트 중앙 정렬
-    },
-    postDate: {
-        flex: "2",
-        textAlign: "right"
     },
     postList: {
         borderTop: "1px solid #f5e4ae",
