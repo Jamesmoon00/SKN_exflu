@@ -1,25 +1,25 @@
 # FastAPI 및 서버
-fastapi==0.103.1
-uvicorn[standard]==0.23.1
+fastapi
+uvicorn[standard]
 fastapi[standard]
 
 # 데이터베이스
-sqlalchemy==2.0.21
-asyncmy==0.3.5  # MySQL 사용 시
+sqlalchemy
+asyncmy  # MySQL 사용 시
 # asyncpg==0.27.0  # PostgreSQL 사용 시
 pymysql
 
 # AWS 연동
-boto3==1.28.0
+boto3
 
 # 데이터 검증 및 유틸리티
-pydantic==1.10.8
-python-dotenv==1.0.0
+pydantic
+python-dotenv
 
 # 로그 관리 및 테스트
-loguru==0.7.0
-pytest==7.4.0
-httpx==0.24.1
+loguru
+pytest
+httpx
 
 # # JWT 및 인증 (필요 시)
 # pyjwt==2.7.0
