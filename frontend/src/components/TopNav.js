@@ -39,8 +39,8 @@ const styles = {
         backgroundColor: "#fffaea",
         padding: "10px 0",
         width: "100%",
-      },
-      navbarContent: {
+    },
+    navbarContent: {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -49,33 +49,34 @@ const styles = {
         // padding: "0 8px", // 양쪽 여백 추가
         boxSizing: "border-box", // 패딩 포함 계산
         paddingBottom: 5
-      },
-      navbarLine: {
+    },
+    navbarLine: {
         width: "95%", // 가로선 폭을 navbarContent와 동일하게 설정
         maxWidth: "1600px", // 최대 폭 증가
         height: "2px",
         backgroundColor: "#f5e4ae",
-      },
-      logo: {
+    },
+    logo: {
         fontSize: "2.5rem",
         fontWeight: "bold",
         textDecoration: "none",
         color: "#000",
-      },
-      navLinks: {
+    },
+    navLinks: {
         display: "flex",
         gap: "90px", // 링크 간 간격 증가
-      },
-      link: {
+        alignItems: "center"
+    },
+    link: {
         textDecoration: "none",
         color: "#000",
         padding: 10,
         fontSize: "1.5rem",
-      },
-      icon: {
+    },
+    icon: {
         display: "flex",
         alignItems: "center",
-      }
+    }
 }
 
 export default TopNav

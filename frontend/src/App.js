@@ -36,12 +36,16 @@ function App() {
 const styles = {
   
   container: {
+    display: "flex",
+    flexDirection: "column",
+   
     backgroundColor: "#fffaea",
   },
   
   pageContent: {
     minHeight: "100vh",
-    padding: "0 40px",
+    // padding: "0 40px",
+    
     width: "100%", // 네비게이션 바와 동일한 폭
     boxSizing: "border-box",
   },

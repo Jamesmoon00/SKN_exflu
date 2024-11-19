@@ -11,7 +11,7 @@ const Write = () => {
                         <p style={styles.postDate}>2024-11-15</p>
                     </div>
                 </div>
-                <p>dd</p>
+                
             </div>
         </div>
     );
