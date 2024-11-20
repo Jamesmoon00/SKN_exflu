@@ -20,5 +20,8 @@ COPY . .
 # FastAPI 애플리케이션 실행 포트 설정 (ECS에서는 8000 사용)
 EXPOSE 8020
 
+# Define the Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s CMD curl -f http://localhost:8020/health || exit 1
+
 # FastAPI 서버 실행
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8020"]
