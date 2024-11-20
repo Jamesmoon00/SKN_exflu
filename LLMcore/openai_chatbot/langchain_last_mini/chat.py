@@ -4,7 +4,6 @@ from langchain_last_mini.langgraph.graph import set_workflow_to_app
 from langchain_last_mini.chain import make_chain, runnable_parallel_chain, runnable_lambda_chain
 from langchain_last_mini.langgraph.tools import get_langgraph_tools
 from langchain_last_mini.langgraph.agent import create_openai_langgraph_agent
-from langchain_last_mini.langgraph.img_save import save_langgraph_structure_img
 import time
 
 # # @st.cache_data # 데이터를 caching 처리 
