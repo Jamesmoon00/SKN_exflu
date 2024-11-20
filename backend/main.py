@@ -7,6 +7,7 @@ import models
 from sqlalchemy.future import select
 from database import engine, AsyncSessionLocal
 from sqlalchemy.orm import Session
+from fastapi.responses import PlainTextResponse
 # FastAPI 애플리케이션을 초기화합니다.
 app = FastAPI()
 # 데이터베이스 모델을 생성합니다.
@@ -32,7 +33,7 @@ class SpecificationsBase(BaseModel):
     spec_value:str
 
 # Health Check 엔드포인트 추가
-@app.get("/health")
+@app.get("/health", response_class=PlainTextResponse)
 async def health_check():
     return "ok"
 
