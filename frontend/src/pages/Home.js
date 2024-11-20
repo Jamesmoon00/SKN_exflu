@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import FirstSection from "../components/FirstSection";
-import SecondSection from "../components/SecondSection";
-import ThirdSection from "../components/ThirdSection";
+import FirstSection from "../components/home/FirstSection";
+import SecondSection from "../components/home/SecondSection";
+import ThirdSection from "../components/home/ThirdSection";
 
 const Home = () => {
     const [activeSection, setActiveSection] = useState(0); // 현재 활성화된 화면 (0: 첫 화면)
@@ -55,7 +55,7 @@ const styles = {
         top: 0,
         height: "100vh", // 한 화면에 꽉 차게 설정
         // display: "flex",
-        width: "95%",
+        width: "100%",
         justifyContent: "center",
         alignItems: "center",
     },
