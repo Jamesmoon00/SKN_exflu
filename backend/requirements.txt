@@ -2,6 +2,7 @@
 fastapi
 uvicorn[standard]
 fastapi[standard]
+fastapi-health
 
 # 데이터베이스
 sqlalchemy
