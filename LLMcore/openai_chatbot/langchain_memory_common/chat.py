@@ -18,9 +18,15 @@ def response_from_langgraph(prompt, message_history=[], model_id:str="gpt-4o-min
             "intermediate_steps":[]}
     config={"configurable": {"thread_id": "1"}}
     output = set_workflow_to_app().invoke(inputs, config)
-    response_from_graph = output['agent_outcome'].content
+    response_from_graph = output['agent_outcome']
+        # 스트리밍 데이터 반환 처리
+    for chunk in response_from_graph.content:
+        if chunk is not None:
+            yield chunk  # 여기서 chunk를 한 조각씩 반환
+            time.sleep(0.01)
+    
     # message_history.append({"role": "assistant", "content": response_from_graph})
-    return response_from_graph
+    # return response_from_graph
 
 
 def response_from_langchain(prompt, message_history=[], model_id:str="gpt-4o-mini"):
