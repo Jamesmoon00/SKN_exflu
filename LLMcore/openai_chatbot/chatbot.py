@@ -1,13 +1,11 @@
-from langchain_memory_common.constant import CHATBOT_ROLE, CHATBOT_MESSAGE
-from langchain_memory_common.prompt import create_message
-from langchain_memory_common.utils import init_chatbot
-from langchain_memory_common.chat import response_from_langchain, response_from_runnable_lambda, response_from_runnable_parallel, response_from_langgraph
+from langchain_last_mini.constant import CHATBOT_ROLE, CHATBOT_MESSAGE
+from langchain_last_mini.prompt import create_message
+from langchain_last_mini.chat import response_from_langchain, response_from_runnable_lambda, response_from_runnable_parallel, response_from_langgraph
 import streamlit as st
 
-# 초기화
-init_chatbot()
+st.title("Chat Bot final mini")
 
-st.title("Chat Bot Memory Exam")
+# ... existing code ...
 
 # 메세지를 저장 
 # messages = {"role":"", "content":""}
@@ -37,3 +35,4 @@ if prompt:
             # assistant_response = response_from_llm(prompt)
             # st.markdown(assistant_response)
             assistant_response = st.write(response_from_langgraph(prompt=prompt, message_history=st.session_state.messages))
+            # st.session_state.messages.append({"role": "assistant", "content": assistant_response})

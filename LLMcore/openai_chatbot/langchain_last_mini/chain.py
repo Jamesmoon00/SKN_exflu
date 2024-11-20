@@ -1,5 +1,5 @@
-from langchain_memory_common.model import creat_chat_model, create_prompt
-from langchain_memory_common.prompt import create_runnable_lambda
+from langchain_last_mini.model import creat_chat_model, create_prompt
+from langchain_last_mini.prompt import create_runnable_lambda
 from langchain_core.runnables import RunnableParallel, RunnableLambda, RunnablePassthrough
 from langchain_core.prompts import PromptTemplate
 from datetime import datetime

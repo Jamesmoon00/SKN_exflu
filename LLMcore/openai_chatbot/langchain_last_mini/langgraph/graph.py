@@ -1,7 +1,7 @@
 ##      Define the graph
 from langgraph.graph import END, StateGraph
-from langchain_memory_common.langgraph.state import AgentState
-from langchain_memory_common.langgraph.nodes import run_agent, execute_tools, should_continue, call_model
+from langchain_last_mini.langgraph.state import AgentState
+from langchain_last_mini.langgraph.nodes import run_agent, execute_tools, should_continue, call_model, go_web_search, is_response_adequate
 from langgraph.checkpoint.memory import MemorySaver
 
 # lang-graph structure
@@ -9,18 +9,18 @@ def create_graph_structure():
     workflow = StateGraph(AgentState)
     workflow.set_entry_point("agent")
     workflow.add_node("agent", run_agent)
-    workflow.add_node("action", execute_tools)
+    workflow.add_node("action", go_web_search)
     workflow.add_node("memory_node", call_model)
     workflow.add_conditional_edges(
         "agent",
-        should_continue,
+        is_response_adequate,
         {
-            "continue": "action",
-            "end": "memory_node"
+            "use_search": "action",
+            "final_response": "memory_node"
         }
     )
-    workflow.add_edge('action', 'agent')
-    # workflow.add_edge("memory_node", END)
+    workflow.add_edge('action', 'memory_node')
+    workflow.add_edge("memory_node", END)
     return workflow
 
 # app
