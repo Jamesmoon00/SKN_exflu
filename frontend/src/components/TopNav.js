@@ -41,7 +41,7 @@ const TopNav = () => {
                         onMouseEnter={handleLogoMouseEnter}
                         onMouseLeave={handleLogoMouseLeave}
                     >
-                        🍪
+                        exFlu;
                     </Link>
                     <div style={styles.navLinks}>
                         {["profile", "blog", "contact "].map((text) => (
@@ -115,11 +115,14 @@ const styles = {
         bottom: 0,
     },
     logo: {
-        fontSize: "2.3rem", // 로고 크기를 줄여 네비바 높이에 맞춤
+        fontSize: "2rem", // 로고 크기를 줄여 네비바 높이에 맞춤
         fontWeight: "bold",
         textDecoration: "none",
         color: "#000",
         transition: "all 0.3s ease-in-out",
+        background: "linear-gradient(to bottom, #3F201F, #A57451)", // 그라데이션 효과
+        WebkitBackgroundClip: "text", // 텍스트에만 적용
+        WebkitTextFillColor: "transparent", // 텍스트 내부를 투명하게
     },
     logoHover: {
         fontSize: "2.4rem", // 호버 시 크기 조금만 증가
