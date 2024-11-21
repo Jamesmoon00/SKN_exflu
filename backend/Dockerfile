@@ -24,4 +24,4 @@ EXPOSE 8005
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s CMD curl -f http://localhost:8005/health || exit 1
 
 # FastAPI 서버 실행
-CMD ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8005"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8005"]
