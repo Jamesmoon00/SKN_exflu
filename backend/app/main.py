@@ -3,7 +3,7 @@ from typing import Union
 from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Annotated
-import models
+from app import models
 from sqlalchemy.future import select
 from database import engine, AsyncSessionLocal
 from sqlalchemy.orm import Session
