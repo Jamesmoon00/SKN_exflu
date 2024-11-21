@@ -29,7 +29,6 @@ class HealthCheck(BaseModel):
 def root():
     return {"status": "OK"}
 
-
 @app.get(
     "/health",
     tags=["healthcheck"],
