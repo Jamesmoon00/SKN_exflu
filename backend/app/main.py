@@ -1,11 +1,10 @@
 from typing import Union
-
 from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Annotated
 from app import models
 from sqlalchemy.future import select
-from database import engine, AsyncSessionLocal
+from app.database import engine, AsyncSessionLocal
 from sqlalchemy.orm import Session
 from fastapi.responses import PlainTextResponse
 from fastapi import FastAPI, Depends
