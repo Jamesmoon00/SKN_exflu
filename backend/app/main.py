@@ -25,6 +25,10 @@ class HealthCheck(BaseModel):
 
     status: str = "OK"
 
+@app.get("/")
+def root():
+    return {"status": "OK"}
+
 
 @app.get(
     "/health",

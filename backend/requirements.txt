@@ -1,30 +1,28 @@
 # FastAPI 및 서버
-fastapi
-uvicorn
-fastapi[standard]
-fastapi-health
+fastapi[standard]  # 표준 FastAPI 설치 (fastapi + 추가 패키지 포함)
+uvicorn            # ASGI 서버
+fastapi-health     # Health Check를 위한 FastAPI 모듈
 
 # 데이터베이스
-sqlalchemy
-asyncmy  # MySQL 사용 시
-# asyncpg==0.27.0  # PostgreSQL 사용 시
-pymysql
+sqlalchemy         # ORM
+asyncmy            # MySQL용 비동기 드라이버
+pymysql            # MySQL용 동기 드라이버 (필요 시)
 
 # AWS 연동
-boto3
+boto3              # AWS SDK for Python
 
 # 데이터 검증 및 유틸리티
-pydantic
-python-dotenv
+pydantic           # 데이터 검증 및 설정 관리
+python-dotenv      # 환경 변수 관리
 
 # 로그 관리 및 테스트
-loguru
-pytest
-httpx
+loguru             # 고급 로깅 라이브러리
+pytest             # 테스트 프레임워크
+httpx              # 비동기 HTTP 클라이언트
 
-# # JWT 및 인증 (필요 시)
-# pyjwt==2.7.0
-# passlib[bcrypt]==1.7.4
+# JWT 및 인증 (필요 시 활성화)
+# pyjwt==2.7.0      # JSON Web Token 인증
+# passlib[bcrypt]==1.7.4  # 비밀번호 해시화
 
-# # 데이터베이스 마이그레이션 (선택)
-# alembic==1.12.0
+# 데이터베이스 마이그레이션 (선택 사항)
+# alembic==1.12.0   # SQLAlchemy 마이그레이션 도구
