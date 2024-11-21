@@ -6,7 +6,7 @@ from langchain_last_mini.utils import init_chatbot
 
 init_chatbot()
 
-st.title("Chat Bot final mini")
+st.title("Chat Bot final test model")
 
 # ... existing code ...
 
