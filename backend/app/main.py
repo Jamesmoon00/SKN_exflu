@@ -112,7 +112,8 @@ async def get_db():
 
 @app.get("/ProductCategories/{category_id}", 
     tags=["database"],
-    status_code=status.HTTP_200_OK)
+    summary="Get product categories",
+    status_code=status.HTTP_200_OK,)
 async def read_user(category_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.ProductCategories).filter(models.ProductCategories.category_id == category_id)
@@ -124,7 +125,8 @@ async def read_user(category_id: int, db: Session = Depends(get_db)):
 
 @app.get("/Products/{product_id}", 
     tags=["database"],
-    status_code=status.HTTP_200_OK)
+    summary="Get products info by product_id",
+    status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.Products).filter(models.Products.product_id == product_id)
@@ -136,7 +138,8 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
 
 @app.get("/Specifications_laptop/{product_id}", 
     tags=["database"],
-    status_code=status.HTTP_200_OK)
+    summary="Get products of laptop spac by product_id",
+    status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.Specifications_laptop).filter(models.Specifications_laptop.product_id == product_id)
@@ -148,7 +151,8 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
 
 @app.get("/Specifications_smartphone/{product_id}",  
     tags=["database"],
-    status_code=status.HTTP_200_OK)
+    summary="Get products of smartphone spac by product_id",
+    status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.Specifications_smartphone).filter(models.Specifications_smartphone.product_id == product_id)
@@ -160,7 +164,8 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
 
 @app.get("/Specifications_tabletpc/{product_id}",  
     tags=["database"],
-    status_code=status.HTTP_200_OK)
+    summary="Get products of tabletpc spac by product_id",
+    status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.Specifications_tabletpc).filter(models.Specifications_tabletpc.product_id == product_id)
