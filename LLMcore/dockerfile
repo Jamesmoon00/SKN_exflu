@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+# pip 업그레이드 추가
+RUN pip install --upgrade pip
+    
 # 코드 복사 
 COPY ./openai_chatbot /app
 COPY ./requirements.txt /app

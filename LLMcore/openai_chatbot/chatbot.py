@@ -102,7 +102,7 @@ if "specs_smartphone_data" not in st.session_state:
 # 제품 데이터 요청
 product_id = st.number_input("제품 ID 입력:", min_value=1, step=1, key="product_id")
 if st.button("제품 정보 조회"):
-    url = "https://backdocsend.jamesmoon.click:8000/products"
+    url = "https://backdocsend.jamesmoon.click/products"
     response = requests.post(url, json={"product_id": product_id})
     if response.status_code == 200:
         st.session_state["products_data"] = response.json()
@@ -112,7 +112,7 @@ if st.button("제품 정보 조회"):
 # 노트북 사양 데이터 요청
 laptop_id = st.number_input("노트북 ID 입력:", min_value=1, step=1, key="laptop_id")
 if st.button("노트북 사양 조회"):
-    url = "https://backdocsend.jamesmoon.click:8000/specifications_laptop"
+    url = "https://backdocsend.jamesmoon.click/specifications_laptop"
     response = requests.post(url, json={"product_id": laptop_id})
     if response.status_code == 200:
         st.session_state["specs_laptop_data"] = response.json()
@@ -122,7 +122,7 @@ if st.button("노트북 사양 조회"):
 # 태블릿PC 사양 데이터 요청
 tablet_id = st.number_input("태블릿PC ID 입력:", min_value=1, step=1, key="tablet_id")
 if st.button("태블릿PC 사양 조회"):
-    url = "https://backdocsend.jamesmoon.click:8000/specifications_tabletpc"
+    url = "https://backdocsend.jamesmoon.click/specifications_tabletpc"
     response = requests.post(url, json={"product_id": tablet_id})
     if response.status_code == 200:
         st.session_state["specs_tabletpc_data"] = response.json()
@@ -132,7 +132,7 @@ if st.button("태블릿PC 사양 조회"):
 # 스마트폰 사양 데이터 요청
 smartphone_id = st.number_input("스마트폰 ID 입력:", min_value=1, step=1, key="smartphone_id")
 if st.button("스마트폰 사양 조회"):
-    url = "https://backdocsend.jamesmoon.click:8000/specifications_smartphone"
+    url = "https://backdocsend.jamesmoon.click/specifications_smartphone"
     response = requests.post(url, json={"product_id": smartphone_id})
     if response.status_code == 200:
         st.session_state["specs_smartphone_data"] = response.json()
