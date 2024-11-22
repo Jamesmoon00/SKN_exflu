@@ -1,10 +1,11 @@
 from typing import Union
+
 from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Annotated
 from app import models
 from sqlalchemy.future import select
-from app.database import engine, AsyncSessionLocal
+from app.database.database import engine, AsyncSessionLocal
 from sqlalchemy.orm import Session
 from fastapi.responses import PlainTextResponse
 from fastapi import FastAPI, Depends
@@ -33,17 +34,8 @@ class HealthCheck(BaseModel):
     status_code=status.HTTP_200_OK,
     response_model=HealthCheck,
 )
-def get_health() -> HealthCheck:
-    """
-    ## Perform a Health Check
-    Endpoint to perform a healthcheck on. This endpoint can primarily be used Docker
-    to ensure a robust container orchestration and management is in place. Other
-    services which rely on proper functioning of the API service will not deploy if this
-    endpoint returns any other HTTP status code except 200 (OK).
-    Returns:
-        HealthCheck: Returns a JSON response with the health status
-    """
-    return HealthCheck(status="OK")
+def root():
+    return {"status": "OK"}
 
 @app.get(
     "/health",
@@ -118,7 +110,9 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@app.get("/ProductCategories/{category_id}", status_code=status.HTTP_200_OK)
+@app.get("/ProductCategories/{category_id}", 
+    tags=["database"],
+    status_code=status.HTTP_200_OK)
 async def read_user(category_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.ProductCategories).filter(models.ProductCategories.category_id == category_id)
@@ -128,7 +122,9 @@ async def read_user(category_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="There has no product category")
     return category_result
 
-@app.get("/Products/{product_id}", status_code=status.HTTP_200_OK)
+@app.get("/Products/{product_id}", 
+    tags=["database"],
+    status_code=status.HTTP_200_OK)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.Products).filter(models.Products.product_id == product_id)
@@ -138,7 +134,9 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Products are not found")
     return product_result
 
-@app.get("/Specifications_laptop/{product_id}", status_code=status.HTTP_200_OK)
+@app.get("/Specifications_laptop/{product_id}", 
+    tags=["database"],
+    status_code=status.HTTP_200_OK)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.Specifications_laptop).filter(models.Specifications_laptop.product_id == product_id)
@@ -148,7 +146,9 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Products are not found")
     return laptop_result
 
-@app.get("/Specifications_smartphone/{product_id}", status_code=status.HTTP_200_OK)
+@app.get("/Specifications_smartphone/{product_id}",  
+    tags=["database"],
+    status_code=status.HTTP_200_OK)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.Specifications_smartphone).filter(models.Specifications_smartphone.product_id == product_id)
@@ -158,7 +158,9 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Products are not found")
     return smartphone_result
 
-@app.get("/Specifications_tabletpc/{product_id}", status_code=status.HTTP_200_OK)
+@app.get("/Specifications_tabletpc/{product_id}",  
+    tags=["database"],
+    status_code=status.HTTP_200_OK)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
     select(models.Specifications_tabletpc).filter(models.Specifications_tabletpc.product_id == product_id)

@@ -25,15 +25,15 @@ def get_parameter(name, with_decryption=True):
     return response['Parameter']['Value']
 
 
-# # Parameter Store에서 값을 가져옴
-# db_username = get_parameter("/MYAPP/DB/USERNAME")
-# db_password = get_parameter("/MYAPP/DB/PASSWORD")
-# db_host = get_parameter("/MYAPP/DB/HOST")
-# db_port = get_parameter("/MYAPP/DB/PORT")
-# db_name = get_parameter("/MYAPP/DB/DB_NAME")
+# Parameter Store에서 값을 가져옴
+db_username = get_parameter("/MYAPP/DB/USERNAME")
+db_password = get_parameter("/MYAPP/DB/PASSWORD")
+db_host = get_parameter("/MYAPP/DB/HOST")
+db_port = get_parameter("/MYAPP/DB/PORT")
+db_name = get_parameter("/MYAPP/DB/DB_NAME")
 
 # DATABASE_URL 구성
-DATABASE_URL = f"mysql+asyncmy://influencerdb.c18uiyu26mws.ap-northeast-2.rds.amazonaws.com"
+DATABASE_URL = f"mysql+asyncmy://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 # 비동기 엔진 및 세션 생성
 engine = create_async_engine(DATABASE_URL, echo=True)
