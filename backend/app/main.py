@@ -1,5 +1,5 @@
-from typing import Union
-
+from typing import List, Optional, Union
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Annotated
@@ -19,6 +19,14 @@ import uvicorn
 
 
 app = FastAPI()
+
+# CORS 설정 추가
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 모든 도메인 허용
+    allow_methods=["*"],  # 모든 HTTP 메서드 허용 (GET, POST, DELETE 등)
+    allow_headers=["*"],  # 모든 HTTP 헤더 허용
+)
 
 
 class HealthCheck(BaseModel):
@@ -81,6 +89,12 @@ https://gist.github.com/Jarmos-san/11bf22c59d26daf0aa5223bdd50440da
 
 #####################
 
+class ProductRequest(BaseModel):
+    product_id: int
+    
+class CategoryRequest(BaseModel):
+    category_id: int
+
 # FastAPI 애플리케이션을 초기화합니다.
 # app = FastAPI()
 # 데이터베이스 모델을 생성합니다.
@@ -108,10 +122,111 @@ class SpecificationsBase(BaseModel):
 # 세션 생성 함수
 async def get_db():
     async with AsyncSessionLocal() as session:
-        yield session
+        try:
+            yield session
+        finally:
+            await session.close()  # 세션이 반드시 닫히도록 설정
 
-@app.get("/ProductCategories/{category_id}", 
-    tags=["database"],
+        
+@app.post("/productcategories", 
+    tags=["Database"],
+    summary="Get product categories",
+    status_code=status.HTTP_200_OK,)
+async def read_user(request: CategoryRequest,db: Session = Depends(get_db)):
+    result = await db.execute(
+        select(models.ProductCategories).filter(models.ProductCategories.category_id == request.category_id)
+    )
+    category_result = result.scalar_one_or_none()  # 첫 번째 결과 반환 또는 None
+    if category_result is None:
+        return {"message": "No products found"}
+    return PrdCategoryBase(category_name= category_result.category_name)
+
+@app.post("/products", 
+    tags=["Database"],
+    summary="Get products",
+    status_code=status.HTTP_200_OK,)
+async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
+    result = await db.execute(
+        select(models.Products).filter(models.Products.product_id == request.product_id)
+    )
+    product_result = result.scalar_one_or_none()  # 첫 번째 결과 반환 또는 None
+    if product_result is None:
+        return {"message": "No products found"}
+    return ProductsBase(category_id= product_result.category_id,
+                        product_name= product_result.product_name,
+                        brand= product_result.brand,
+                        model=product_result.model)
+###
+@app.post("/specifications_laptop", 
+    tags=["Database"],
+    summary="Get products of laptop spac",
+    status_code=status.HTTP_200_OK,
+    response_model=List[SpecificationsBase],  # 여러 항목 반환을 명시
+)
+async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
+    result = await db.execute(
+        select(models.Specifications_laptop).filter(models.Specifications_laptop.product_id == request.product_id)
+    )
+    results = result.scalars().all()
+    if not results:
+        return {"message": "No products found"}
+    # 여러 개의 결과를 직렬화하여 반환
+    return [
+        SpecificationsBase(
+            product_id=item.product_id,
+            spec_name=item.spec_name,
+            spec_value=item.spec_value
+        )
+        for item in results
+    ]
+
+@app.post("/specifications_smartphone", 
+    tags=["Database"],
+    summary="Get products of smartphone spac",
+    status_code=status.HTTP_200_OK,
+    response_model=List[SpecificationsBase],  # 여러 항목 반환을 명시
+)
+async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
+    result = await db.execute(
+        select(models.Specifications_smartphone).filter(models.Specifications_smartphone.product_id == request.product_id)
+    )
+    results = result.scalars().all()
+    if not results:
+        return {"message": "No products found"}
+    # 여러 개의 결과를 직렬화하여 반환
+    return [
+        SpecificationsBase(
+            product_id=item.product_id,
+            spec_name=item.spec_name,
+            spec_value=item.spec_value
+        )
+        for item in results
+    ]
+@app.post("/specifications_tabletpc", 
+    tags=["Database"],
+    summary="Get products of tabletpc spac",
+    status_code=status.HTTP_200_OK,
+    response_model=List[SpecificationsBase],  # 여러 항목 반환을 명시
+)
+async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
+    result = await db.execute(
+        select(models.Specifications_tabletpc).filter(models.Specifications_tabletpc.product_id == request.product_id)
+    )
+    results = result.scalars().all()
+    if not results:
+        return {"message": "No products found"}
+    # 여러 개의 결과를 직렬화하여 반환
+    return [
+        SpecificationsBase(
+            product_id=item.product_id,
+            spec_name=item.spec_name,
+            spec_value=item.spec_value
+        )
+        for item in results
+    ]
+
+@app.post("/productcategories/{category_id}", 
+    tags=["Check Database"],
     summary="Get product categories",
     status_code=status.HTTP_200_OK,)
 async def read_user(category_id: int, db: Session = Depends(get_db)):
@@ -123,8 +238,8 @@ async def read_user(category_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="There has no product category")
     return category_result
 
-@app.get("/Products/{product_id}", 
-    tags=["database"],
+@app.post("/products/{product_id}", 
+    tags=["Check Database"],
     summary="Get products info by product_id",
     status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
@@ -136,8 +251,8 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Products are not found")
     return product_result
 
-@app.get("/Specifications_laptop/{product_id}", 
-    tags=["database"],
+@app.post("/specifications_laptop/{product_id}", 
+    tags=["Check Database"],
     summary="Get products of laptop spac by product_id",
     status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
@@ -149,8 +264,8 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Products are not found")
     return laptop_result
 
-@app.get("/Specifications_smartphone/{product_id}",  
-    tags=["database"],
+@app.post("/specifications_smartphone/{product_id}",  
+    tags=["Check Database"],
     summary="Get products of smartphone spac by product_id",
     status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
@@ -162,8 +277,8 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Products are not found")
     return smartphone_result
 
-@app.get("/Specifications_tabletpc/{product_id}",  
-    tags=["database"],
+@app.post("/specifications_tabletpc/{product_id}",  
+    tags=["Check Database"],
     summary="Get products of tabletpc spac by product_id",
     status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
@@ -192,3 +307,17 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
 #         raise HTTPException(status_code=400, detail="Specification already exists")
     
 #     return new_specification  # 성공적으로 생성된 데이터 반환
+
+# 요청 데이터 모델 정의
+class Item(BaseModel):
+    name: str
+    value: int
+
+# POST 엔드포인트 정의
+@app.post("/process/",  
+    tags=["Check server connection"],
+    summary="Get products of tabletpc spac by product_id",
+    status_code=status.HTTP_200_OK,)
+async def process_item(item: Item):
+    # 클라이언트에서 받은 데이터를 처리 후 반환
+    return {"message": f"Received {item.name} with value {item.value}"}
