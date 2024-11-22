@@ -1,20 +1,5 @@
 import streamlit as st
-from streamlit_extras.switch_page_button import switch_page
 import requests
-
-page = st.sidebar.selectbox(
-    "Select a page",
-    ["llm_main_page", "llm model test ver", "backend connection test"],  # "Select a page" 옵션 제거
-    index=2  # langchain_agent를 기본 선택값으로 설정
-)
-
-if page == "home":
-    switch_page("streamlit_main_page")
-elif page == "llm model test ver":
-    switch_page("llm_model")
-elif page == "backend connection test":
-    switch_page("connection_test")
-
 # Streamlit 제목
 st.title("FastAPI와 Streamlit 간 송수신 테스트")
 

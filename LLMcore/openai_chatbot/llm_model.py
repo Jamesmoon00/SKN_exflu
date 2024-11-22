@@ -1,15 +1,8 @@
-from openai_chatbot.langchain_last_mini.constant import CHATBOT_ROLE, CHATBOT_MESSAGE
-from openai_chatbot.langchain_last_mini.prompt import create_message
-from openai_chatbot.langchain_last_mini.chat import response_from_langchain, response_from_runnable_lambda, response_from_runnable_parallel, response_from_langgraph
+from langchain_last_mini.constant import CHATBOT_ROLE, CHATBOT_MESSAGE
+from langchain_last_mini.prompt import create_message
+from langchain_last_mini.chat import response_from_langchain, response_from_runnable_lambda, response_from_runnable_parallel, response_from_langgraph
 import streamlit as st
-from openai_chatbot.langchain_last_mini.utils import init_chatbot
-from streamlit_extras.switch_page_button import switch_page
-
-page = st.sidebar.selectbox(
-    "Select a page",
-    ["llm_main_page", "llm model test ver", "backend connection test"],  # "Select a page" 옵션 제거
-    index=1  # langchain_agent를 기본 선택값으로 설정
-)
+from langchain_last_mini.utils import init_chatbot
 
 init_chatbot()
 
