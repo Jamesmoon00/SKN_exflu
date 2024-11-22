@@ -1,5 +1,19 @@
 import streamlit as st
+from streamlit_extras.switch_page_button import switch_page
 import requests
+
+page = st.sidebar.selectbox(
+    "Select a page",
+    ["llm_main_page", "llm model test ver", "backend connection test"],  # "Select a page" 옵션 제거
+    index=2  # langchain_agent를 기본 선택값으로 설정
+)
+
+if page == "home":
+    switch_page("streamlit_main_page")
+elif page == "llm model test ver":
+    switch_page("llm_model")
+elif page == "backend connection test":
+    switch_page("connection_test")
 
 # Streamlit 제목
 st.title("FastAPI와 Streamlit 간 송수신 테스트")
@@ -10,7 +24,7 @@ value = st.number_input("값 입력:", min_value=0, step=1)
 
 # 버튼 클릭 시 FastAPI로 데이터 송신
 if st.button("전송", key="test_butten"):
-    url = "https://backdocsend.jamesmoon.click/process/"  # FastAPI 엔드포인트 (fastapi url)
+    url = "http://test-backend-container:8000/process/"  # FastAPI 엔드포인트 (fastapi url)
     payload = {"name": name, "value": value}  # 전송할 데이터
     try:
         # FastAPI로 POST 요청
@@ -102,7 +116,7 @@ if "specs_smartphone_data" not in st.session_state:
 # 제품 데이터 요청
 product_id = st.number_input("제품 ID 입력:", min_value=1, step=1, key="product_id")
 if st.button("제품 정보 조회"):
-    url = "https://backdocsend.jamesmoon.click/products"
+    url = "http://127.0.0.1:8000/products"
     response = requests.post(url, json={"product_id": product_id})
     if response.status_code == 200:
         st.session_state["products_data"] = response.json()
@@ -112,7 +126,7 @@ if st.button("제품 정보 조회"):
 # 노트북 사양 데이터 요청
 laptop_id = st.number_input("노트북 ID 입력:", min_value=1, step=1, key="laptop_id")
 if st.button("노트북 사양 조회"):
-    url = "https://backdocsend.jamesmoon.click/specifications_laptop"
+    url = "http://127.0.0.1:8000/specifications_laptop"
     response = requests.post(url, json={"product_id": laptop_id})
     if response.status_code == 200:
         st.session_state["specs_laptop_data"] = response.json()
@@ -122,7 +136,7 @@ if st.button("노트북 사양 조회"):
 # 태블릿PC 사양 데이터 요청
 tablet_id = st.number_input("태블릿PC ID 입력:", min_value=1, step=1, key="tablet_id")
 if st.button("태블릿PC 사양 조회"):
-    url = "https://backdocsend.jamesmoon.click/specifications_tabletpc"
+    url = "http://127.0.0.1:8000/specifications_tabletpc"
     response = requests.post(url, json={"product_id": tablet_id})
     if response.status_code == 200:
         st.session_state["specs_tabletpc_data"] = response.json()
@@ -132,7 +146,7 @@ if st.button("태블릿PC 사양 조회"):
 # 스마트폰 사양 데이터 요청
 smartphone_id = st.number_input("스마트폰 ID 입력:", min_value=1, step=1, key="smartphone_id")
 if st.button("스마트폰 사양 조회"):
-    url = "https://backdocsend.jamesmoon.click/specifications_smartphone"
+    url = "http://127.0.0.1:8000/specifications_smartphone"
     response = requests.post(url, json={"product_id": smartphone_id})
     if response.status_code == 200:
         st.session_state["specs_smartphone_data"] = response.json()
