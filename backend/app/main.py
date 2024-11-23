@@ -23,7 +23,7 @@ app = FastAPI()
 # CORS 설정 추가
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://streamlitllmcore.jamesmoon.click"],  # 모든 도메인 허용
+    allow_origins=["https://streamlitllmcore.jamesmoon.click", "https://www.jamesmoon.click"],  # 모든 도메인 허용
     allow_methods=["*"],  # 모든 HTTP 메서드 허용 (GET, POST, DELETE 등)
     allow_headers=["*"],  # 모든 HTTP 헤더 허용
 )
