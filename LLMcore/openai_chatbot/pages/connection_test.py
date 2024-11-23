@@ -9,7 +9,7 @@ value = st.number_input("값 입력:", min_value=0, step=1)
 
 # 버튼 클릭 시 FastAPI로 데이터 송신
 if st.button("전송", key="test_butten"):
-    url = "https://backdocsend.jamesmoon.click//process/"  # FastAPI 엔드포인트 (fastapi url)
+    url = "https://backdocsend.jamesmoon.click/process/"  # FastAPI 엔드포인트 (fastapi url)
     payload = {"name": name, "value": value}  # 전송할 데이터
     try:
         # FastAPI로 POST 요청
