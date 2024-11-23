@@ -89,11 +89,6 @@ https://gist.github.com/Jarmos-san/11bf22c59d26daf0aa5223bdd50440da
 
 #####################
 
-class ProductRequest(BaseModel):
-    product_id: int
-    
-class CategoryRequest(BaseModel):
-    category_id: int
 
 # FastAPI 애플리케이션을 초기화합니다.
 # app = FastAPI()
@@ -103,6 +98,12 @@ class CategoryRequest(BaseModel):
 # class로 다룰 때, primary_key를 다루지 않음
 # 외래키는 다루긴 함
 # product categories 모델의 기본 구조를 정의합니다.
+class ProductRequest(BaseModel):
+    product_id: int
+    
+class CategoryRequest(BaseModel):
+    category_id: int
+    
 class PrdCategoryBase(BaseModel):
     category_name:str
 
@@ -231,7 +232,7 @@ async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,)
 async def read_user(category_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
-    select(models.ProductCategories).filter(models.ProductCategories.category_id == category_id)
+        select(models.ProductCategories).filter(models.ProductCategories.category_id == category_id)
     )
     category_result = result.scalar_one_or_none()  # 첫 번째 결과 반환 또는 None
     if category_result is None:
@@ -244,7 +245,7 @@ async def read_user(category_id: int, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
-    select(models.Products).filter(models.Products.product_id == product_id)
+        select(models.Products).filter(models.Products.product_id == product_id)
     )
     product_result = result.scalar_one_or_none()  # 첫 번째 결과 반환 또는 None
     if product_result is None:
@@ -257,7 +258,7 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
-    select(models.Specifications_laptop).filter(models.Specifications_laptop.product_id == product_id)
+        select(models.Specifications_laptop).filter(models.Specifications_laptop.product_id == product_id)
     )
     laptop_result = result.scalars().all()  # 첫 번째 결과 반환 또는 None
     if not laptop_result:
@@ -270,7 +271,7 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
-    select(models.Specifications_smartphone).filter(models.Specifications_smartphone.product_id == product_id)
+        select(models.Specifications_smartphone).filter(models.Specifications_smartphone.product_id == product_id)
     )
     smartphone_result = result.scalars().all()  # 첫 번째 결과 반환 또는 None
     if not smartphone_result:
@@ -283,7 +284,7 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,)
 async def read_user(product_id: int, db: Session = Depends(get_db)):
     result = await db.execute(
-    select(models.Specifications_tabletpc).filter(models.Specifications_tabletpc.product_id == product_id)
+        select(models.Specifications_tabletpc).filter(models.Specifications_tabletpc.product_id == product_id)
     )
     tabletpc_result = result.scalars().all()  # 첫 번째 결과 반환 또는 None
     if not tabletpc_result:
