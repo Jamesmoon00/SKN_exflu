@@ -1,4 +1,5 @@
 import React from "react";
+import contact from "../assets/img/contact_logo.png";
 
 const ContactUs = () => {
     return (

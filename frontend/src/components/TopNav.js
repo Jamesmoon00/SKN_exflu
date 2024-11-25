@@ -41,7 +41,7 @@ const TopNav = () => {
                         onMouseEnter={handleLogoMouseEnter}
                         onMouseLeave={handleLogoMouseLeave}
                     >
-                        exFlu;
+                        eXflu;
                     </Link>
                     <div style={styles.navLinks}>
                         {["profile", "blog", "contact "].map((text) => (
@@ -92,6 +92,7 @@ const styles = {
         boxSizing: "border-box",
         position: "relative", // 선 고정을 위한 부모 요소 설정
     },
+    
     navbarContent: {
     
         display: "flex",

@@ -1,5 +1,5 @@
 import React from "react"
-import Eddyfilm from "../../assets/img/image.png"
+import Eddyfilm from "../../assets/img/eddy_list.png"
 const ThirdSection = () => {
     return (
         <>
