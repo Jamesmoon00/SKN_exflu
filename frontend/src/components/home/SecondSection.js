@@ -68,8 +68,8 @@ const styles = {
         width: "80%",
     },
     card: {
-        width: "270px",
-        height: "350px",
+        width: "300px",
+        height: "400px",
         backgroundColor: "#FFFEF9",
         borderRadius: "15px",
         filter: `drop-shadow(0px 6px 20px rgba(249, 217, 120, 0.6)) 

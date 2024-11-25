@@ -3,6 +3,8 @@ import profileImage from "../assets/img/eddy_profile.png";
 import bombImage from "../assets/img/bomb_eddy.png";
 import hearticon from "../assets/icons/heart.png";
 import comment from "../assets/icons/comment.png";
+import SideCard from "./board/SideCard";
+import Comment from "./board/Comment";
 const Write = () => {
     const [comments, setComments] = useState([]); // 댓글 리스트 상태
     const [writer, setWriter] = useState(""); // 작성자 입력 상태
@@ -23,8 +25,17 @@ const Write = () => {
         setWriter("");
         setContent("");
     };
+
+    // 댓글 수정 핸들러
+    const handleEditComment = (id) => {
+        alert(`댓글 ${id} 수정하기 클릭됨!`);
+    };
+
     return (
         <div style={styles.container}>
+            {/* 왼쪽 사이드카드 */}
+            <SideCard />
+
             <div style={styles.post}>
                 <div style={styles.postHeader}>
                     <img src={profileImage} alt="" style={styles.profileImage} />
@@ -36,7 +47,6 @@ const Write = () => {
 
                 <div style={styles.Imagecontainer}>
                     <img src={bombImage} alt="Character Scene" style={styles.image} />
-
                 </div>
 
                 <div style={styles.contentbox}>
@@ -50,83 +60,68 @@ const Write = () => {
                 </div>
 
                 <div style={styles.commentHeader}>
-                        <img src={comment} alt="comment icon" style={styles.commentword} />
-                        <p style={styles.commentHeaderText}>comment</p> 
-                        
+                    <img src={comment} alt="comment icon" style={styles.commentword} />
+                    <p style={styles.commentHeaderText}>comment</p>
                 </div>
                 <div style={styles.contentLine}></div>
-                
+
                 {/* 댓글 리스트 */}
-                <div>
-                    {comments.map((comment) => (
-                        <div key={comment.id} style={styles.commentItem}>
-                            <p>
-                                <strong>{comment.writer}</strong>: {comment.content}
-                            </p>
-                        </div>
-                    ))}
-                </div>
+                <Comment comments={comments} onEdit={handleEditComment} />
 
                 {/* 댓글 작성 폼 */}
                 <div style={styles.commentForm}>
-                    
                     <input
-                            type="text"
-                            placeholder="작성자"
-                            value={writer}
-                            onChange={(e) => setWriter(e.target.value)}
-                            style={styles.input}
+                        type="text"
+                        placeholder="  작성자"
+                        value={writer}
+                        onChange={(e) => setWriter(e.target.value)}
+                        style={styles.input}
                     />
                     <input
-                            type="text"
-                            placeholder="댓글 내용을 입력하세요"
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            style={styles.textarea} 
+                        type="text"
+                        placeholder="  비밀번호"
+                        value={writer}
+                        onChange={(e) => setWriter(e.target.value)}
+                        style={styles.input}
                     />
-                    
-
+                    <input
+                        type="text"
+                        placeholder="  댓글 내용을 입력하세요"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        style={styles.textarea}
+                    />
                 </div>
                 <div style={styles.commnetaddButton}>
                     <button onClick={handleAddComment} style={styles.submitButton}>
                         <p style={styles.buttontext}>등록</p>
                     </button>
                 </div>
-                
-                
             </div>
         </div>
     );
-}
+};
 const styles = {
     container: {
-        alignItems: "center",
         display: "flex",
-        flexDirection: "column", // 세로 방향 정렬
-        // marginLeft: "30px",
-        // marginRight: "30px",
+        // padding: "40px",
+        marginLeft: "45px",
+        marginRight: "45px",
         backgroundColor: "#fffaea",
         minHeight: "100vh",
-        width: "100%",
-        flex: 1,
-        filter: `
-            0px 2px 15px rgba(212, 165, 98, 0.9), 
-            0px 4px 30px rgba(212, 165, 98, 0.7)
-        `,
-        overflow: "auto"
+      
+       
        
     },
+    
     post: {
-        width: "90%",
+        flex: "2.5",
         marginTop: "30px",
-        flex: 3,
+        marginLeft: "40px",
         backgroundColor: "#fffdf7",
         borderRadius: "10px",
         padding: "30px 30px 30px",
-        boxShadow:  `
-        0px 2px 15px rgba(212, 165, 98, 0.3), 
-        0px 4px 30px rgba(212, 165, 98, 0.2)
-        `,
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         // textAlign: "left",
         marginBottom: "30px",
         overflow: "auto"
@@ -193,7 +188,9 @@ const styles = {
         backgroundColor: "#FFF2F1", // 버튼 배경색
         cursor: "pointer",
         transition: "all 0.3s ease-in-out", // 부드러운 전환
-        filter: "drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.2))",
+        border: "none", // 테두리를 완전히 제거
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+       
        
     },
     buttonContent: {
@@ -251,14 +248,16 @@ const styles = {
 
     input: {
         width: "1300px",
-        height: "38px",
-        marginBottom: "20px",
-        borderRadius: "10px"
+        height: "40px",
+        marginBottom: "10px",
+        borderRadius: "10px",
+        border: "1px solid #FFFAEA", // 테두리 색상 및 굵기 변경
     },
     textarea: {
         width: "1300px",
         height: "100px",
-        borderRadius: "10px"
+        borderRadius: "10px",
+        border: "1px solid #FFFAEA", // 테두리 색상 및 굵기 변경
     },
     commnetaddButton: {
         justifyContent: "center",
@@ -268,12 +267,13 @@ const styles = {
     submitButton: {
         marginTop: "20px",
         border: "1px solid #FFF2F1", // 버튼 테두리
-        borderRadius: "10px", // 둥근 버튼
+        borderRadius: "15px", // 둥근 버튼
         backgroundColor: "#FBE5A2", // 버튼 배경색
         justifyContent: "center", // 가로 중앙 정렬
         alignItems: "flex-end", // 세로 중앙 정렬
         width:"100px",
         height: "45x",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 
        
         

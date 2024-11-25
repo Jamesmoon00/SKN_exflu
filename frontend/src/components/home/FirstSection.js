@@ -58,7 +58,7 @@ const styles = {
         background: "linear-gradient(to bottom, #FFFAEA, #FFEFB9)",
     },
     logoSection: {
-        marginTop: "80px",
+        marginTop: "200px",
         display: "flex"
     },
     logoImage: {

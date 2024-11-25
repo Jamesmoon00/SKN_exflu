@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
+
 const TopNav = () => {
+
     const [hoveredLink, setHoveredLink] = useState(null); // 현재 호버된 링크
     const [hoveredLogo, setHoveredLogo] = useState(false); // 로고 호버 상태
     const [hoveredIcon, setHoveredIcon] = useState(false); // 아이콘 호버 상태
@@ -81,6 +83,8 @@ const TopNav = () => {
     );
 };
 const styles = {
+    
+    
     navbar: {
         display: "flex",
         flexDirection: "column",
@@ -99,13 +103,13 @@ const styles = {
         justifyContent: "space-between",
         alignItems: "center",
         width: "95%",
-        maxWidth: "1600px",
+       
         boxSizing: "border-box",
         height: "50px", // 내용 높이를 축소하여 더 얇게
     },
     navbarLine: {
         width: "95%",
-        maxWidth: "1600px",
+      
         height: "1px", // 선의 두께를 줄여 더 깔끔하게
         boxShadow: `
             0px 2px 15px rgba(212, 165, 98, 0.9), 

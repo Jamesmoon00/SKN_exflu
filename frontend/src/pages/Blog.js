@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import profileImage from "../assets/img/eddy_blog.png";
 import axios from "axios";
+import Write from "../components/board/SideCard"
+import SideCard from "../components/board/SideCard";
 
 const Blog = () => {
     const [posts, setPosts] = useState([]); // 게시글 데이터를 저장할 상태
@@ -23,16 +25,16 @@ const Blog = () => {
     return (
         <div style={styles.container}>
             {/* 왼쪽 사이드바 */}
-            <div style={styles.sidebar}>
+            {/* <div style={styles.sidebar}>
                 <img src={profileImage} alt="Profile" style={styles.profileImage} />
                 <h2 style={styles.blogTitle}>Eddy's Blog</h2>
                 <p style={styles.description}>Welcome to my blog!</p>
-            </div>
-
+            </div> */}
+            <SideCard />
             {/* 오른쪽 게시글 리스트 */}
             <div style={styles.blogList}>
                 <div style={styles.blogHeader}>
-                    <p style={styles.postCount}>게시글 목록</p>
+                    <p style={styles.postCount}>✏️목록</p>
                     <div style={styles.postHeader}>
                         <span style={styles.postNum}>번호</span>
                         <span style={styles.postTitle}>글 제목</span>
@@ -53,6 +55,9 @@ const Blog = () => {
                     )}
                 </div>
             </div>
+
+            {/* write */}
+            {/* <Write /> */}
         </div>
     );
 };
@@ -61,43 +66,24 @@ const Blog = () => {
 const styles = {
     container: {
         display: "flex",
-        padding: "40px",
+        marginLeft: "45px",
+        marginRight: "45px",
         backgroundColor: "#fffaea",
         height: "100vh",
     },
-    sidebar: {
-        marginTop: "30px",
-        backgroundColor: "#fffdf7",
-        borderRadius: "10px",
-        padding: "40px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        textAlign: "center",
-    },
-    profileImage: {
-        width: "250px",
-        height: "250px",
-        borderRadius: "50%",
-        objectFit: "cover",
-        marginBottom: "15px",
-    },
-    blogTitle: {
-        fontSize: "1.5rem",
-        fontWeight: "bold",
-        marginBottom: "10px",
-    },
-    description: {
-        fontSize: "0.9rem",
-        color: "#555",
-    },
+    
     blogList: {
         flex: "2.5",
         marginLeft: "40px",
         width: "100%",
+        marginTop: "20px"
     },
     blogHeader: {
-        borderBottom: "2px solid #f5e4ae",
+        borderBottom: "1.5px solid #F1D1A3",
         paddingBottom: "10px",
         marginBottom: "20px",
+       
+  
     },
     postCount: {
         fontSize: "1rem",
@@ -108,6 +94,7 @@ const styles = {
         alignItems: "center",
         fontSize: "0.9rem",
         color: "#555",
+        marginTop: "5px"
     },
     postNum: {
         flex: "1",
