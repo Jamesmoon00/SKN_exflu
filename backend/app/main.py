@@ -1,11 +1,11 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Literal
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Annotated
 from app import models
 from sqlalchemy.future import select
-from app.database.database import engine, AsyncSessionLocal
+from app.common.config import engine, AsyncSessionLocal
 from sqlalchemy.orm import Session
 from fastapi.responses import PlainTextResponse
 from fastapi import FastAPI, Depends
@@ -323,3 +323,84 @@ class Item(BaseModel):
 async def process_item(item: Item):
     # 클라이언트에서 받은 데이터를 처리 후 반환
     return {"message": f"Received {item.name} with value {item.value}"}
+
+##############################################################################################
+
+# Pydantic 모델 정의
+class TitleCreate(BaseModel):
+    title: str
+
+from fastapi import FastAPI, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.exc import IntegrityError
+from pydantic import BaseModel
+
+# 블로그 제목 저장 API
+@app.post("/blog/title", status_code=status.HTTP_201_CREATED)
+async def create_title(title_data: TitleCreate, db: AsyncSession = Depends(get_db)):
+    """
+    블로그 제목을 저장하는 API
+    """
+    new_title = models.BlogPost(title=title_data.title)
+
+    try:
+        # 데이터베이스에 새 레코드 추가
+        db.add(new_title)
+        await db.commit()
+        await db.refresh(new_title)
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to save title"
+        )
+
+    return {"id": new_title.post_id, "title": new_title.title, "created_at": new_title.created_at}
+
+
+##############################################################################################
+
+import requests
+from sqlalchemy.orm import Session
+from app.common.consts import API_GATEWAY_URL, BUCKET_NAME
+# from app.common.config import get_s3_client
+from sqlalchemy import func
+
+# # AWS S3 클라이언트
+# s3_client = get_s3_client()
+
+class Content(BaseModel):
+    block_type: Literal["text", "image"]  # 블록 유형: "text" 또는 "image"
+    content: str  # 텍스트 내용 또는 이미지 URL
+    block_order: int  # 블록 순서
+
+class BlogContent(BaseModel):
+    post_id: int
+    blocks: List[Content]  # 블록들의 리스트
+
+@app.post("/blog/content")
+async def upload_blog(blog: BlogContent , db: AsyncSession = Depends(get_db)): # ,image_data: Optional[UploadFile] =File(None)
+    # 블로그 포스트 저장
+    if not blog.blocks:  # 블록이 비어있는지 확인
+        raise HTTPException(status_code=400, detail="No blocks provided")
+    try:
+        for idx, block in enumerate(blog.blocks):
+            if block.block_type == "text":
+                new_block = models.ContentBlock(
+                    post_id=blog.post_id,
+                    block_type=block.block_type,  # 반복문 내에서 block.block_type로 접근
+                    content=block.content,        # 반복문 내에서 block.content로 접근
+                    block_order=idx               # 반복문 내에서 idx 사용
+                )
+                db.add(new_block)
+                await db.flush()  # DB에 추가된 상태 유지
+                await db.refresh(new_block)  # 새 블록의 상태 갱신
+        await db.commit()
+    except Exception as e:
+        await db.rollback()  # 오류 발생 시 롤백
+        raise HTTPException(status_code=500, detail=f"Failed to save blog blocks: {e}")
+    return {"post_id":new_block.post_id,
+            "block_type":new_block.block_type,  # 반복문 내에서 block.block_type로 접근
+            "content":new_block.content,        # 반복문 내에서 block.content로 접근
+            "block_order":new_block.block_order}

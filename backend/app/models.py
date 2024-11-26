@@ -1,5 +1,22 @@
-from sqlalchemy import Boolean, Column, Integer, String
-from app.database.database import Base
+from sqlalchemy import Boolean, create_engine, Column, Integer, String, Text, Enum, ForeignKey, DateTime
+from app.common.config import Base
+from datetime import datetime
+
+# BlogPost 모델 정의
+class BlogPost(Base):
+    __tablename__ = "blog_posts"
+
+    post_id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ContentBlock(Base):
+    __tablename__ = "content_blocks"
+    block_id = Column(Integer, primary_key=True, index=True)
+    post_id = Column(Integer, ForeignKey("blog_posts.post_id"))
+    block_type = Column(Enum("text", "image"), nullable=False)
+    content = Column(Text, nullable=False)
+    block_order = Column(Integer, nullable=False)
 
 class ProductCategories(Base):
     __tablename__='ProductCategories'
