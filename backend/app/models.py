@@ -1,5 +1,5 @@
-from sqlalchemy import Boolean, create_engine, Column, Integer, String, Text, Enum, ForeignKey, DateTime
 from app.common.config import Base
+from sqlalchemy import Boolean, create_engine, Column, Integer, String, Text, Enum, ForeignKey, DateTime
 from datetime import datetime
 
 # BlogPost 모델 정의
@@ -17,6 +17,7 @@ class ContentBlock(Base):
     block_type = Column(Enum("text", "image"), nullable=False)
     content = Column(Text, nullable=False)
     block_order = Column(Integer, nullable=False)
+
 
 class ProductCategories(Base):
     __tablename__='ProductCategories'

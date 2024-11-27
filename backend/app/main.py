@@ -1,16 +1,25 @@
-from typing import List, Optional, Union, Literal
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, HTTPException, Depends, status
-from pydantic import BaseModel
-from typing import Annotated
 from app import models
-from sqlalchemy.future import select
-from app.common.config import engine, AsyncSessionLocal
-from sqlalchemy.orm import Session
+from app.common.consts import BUCKET_NAME, REGION_NAME #, API_GATEWAY_URL
+from app.common.config import engine, AsyncSessionLocal, s3_client
+# from app.common.config import get_s3_client
+from typing import List, Optional, Union, Literal, Annotated
+from fastapi import FastAPI, HTTPException, Depends, status, Form, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
-from fastapi import FastAPI, Depends
 from fastapi_health import health
+from sqlalchemy import func
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.future import select
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from datetime import datetime
 import uvicorn
+import json
+import time
+import base64
+import requests
+
 
 #####################
 
@@ -23,8 +32,7 @@ app = FastAPI()
 # CORS 설정 추가
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-        #["https://streamlitllmcore.jamesmoon.click", "https://www.jamesmoon.click"],  # 모든 도메인 허용
+    allow_origins=["*"],  # 모든 도메인 허용
     allow_methods=["*"],  # 모든 HTTP 메서드 허용 (GET, POST, DELETE 등)
     allow_headers=["*"],  # 모든 HTTP 헤더 허용
 )
@@ -90,6 +98,22 @@ https://gist.github.com/Jarmos-san/11bf22c59d26daf0aa5223bdd50440da
 
 #####################
 
+# Pydantic 모델 정의
+class TitleCreate(BaseModel):
+    title: str
+    
+class ContentBlock(BaseModel):
+    block_id: int
+    post_id: int
+    block_type: str
+    content: str
+    block_order: int
+
+class ProductRequest(BaseModel):
+    product_id: int
+    
+class CategoryRequest(BaseModel):
+    category_id: int
 
 # FastAPI 애플리케이션을 초기화합니다.
 # app = FastAPI()
@@ -99,12 +123,6 @@ https://gist.github.com/Jarmos-san/11bf22c59d26daf0aa5223bdd50440da
 # class로 다룰 때, primary_key를 다루지 않음
 # 외래키는 다루긴 함
 # product categories 모델의 기본 구조를 정의합니다.
-class ProductRequest(BaseModel):
-    product_id: int
-    
-class CategoryRequest(BaseModel):
-    category_id: int
-    
 class PrdCategoryBase(BaseModel):
     category_name:str
 
@@ -134,7 +152,7 @@ async def get_db():
     tags=["Database"],
     summary="Get product categories",
     status_code=status.HTTP_200_OK,)
-async def read_user(request: CategoryRequest,db: Session = Depends(get_db)):
+async def read_user(request: CategoryRequest,db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(models.ProductCategories).filter(models.ProductCategories.category_id == request.category_id)
     )
@@ -147,7 +165,7 @@ async def read_user(request: CategoryRequest,db: Session = Depends(get_db)):
     tags=["Database"],
     summary="Get products",
     status_code=status.HTTP_200_OK,)
-async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
+async def read_user(request: ProductRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(models.Products).filter(models.Products.product_id == request.product_id)
     )
@@ -165,7 +183,7 @@ async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
     response_model=List[SpecificationsBase],  # 여러 항목 반환을 명시
 )
-async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
+async def read_user(request: ProductRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(models.Specifications_laptop).filter(models.Specifications_laptop.product_id == request.product_id)
     )
@@ -188,7 +206,7 @@ async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
     response_model=List[SpecificationsBase],  # 여러 항목 반환을 명시
 )
-async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
+async def read_user(request: ProductRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(models.Specifications_smartphone).filter(models.Specifications_smartphone.product_id == request.product_id)
     )
@@ -210,7 +228,7 @@ async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
     response_model=List[SpecificationsBase],  # 여러 항목 반환을 명시
 )
-async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
+async def read_user(request: ProductRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(models.Specifications_tabletpc).filter(models.Specifications_tabletpc.product_id == request.product_id)
     )
@@ -231,9 +249,9 @@ async def read_user(request: ProductRequest, db: Session = Depends(get_db)):
     tags=["Check Database"],
     summary="Get product categories",
     status_code=status.HTTP_200_OK,)
-async def read_user(category_id: int, db: Session = Depends(get_db)):
+async def read_user(category_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(models.ProductCategories).filter(models.ProductCategories.category_id == category_id)
+    select(models.ProductCategories).filter(models.ProductCategories.category_id == category_id)
     )
     category_result = result.scalar_one_or_none()  # 첫 번째 결과 반환 또는 None
     if category_result is None:
@@ -244,9 +262,9 @@ async def read_user(category_id: int, db: Session = Depends(get_db)):
     tags=["Check Database"],
     summary="Get products info by product_id",
     status_code=status.HTTP_200_OK,)
-async def read_user(product_id: int, db: Session = Depends(get_db)):
+async def read_user(product_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(models.Products).filter(models.Products.product_id == product_id)
+    select(models.Products).filter(models.Products.product_id == product_id)
     )
     product_result = result.scalar_one_or_none()  # 첫 번째 결과 반환 또는 None
     if product_result is None:
@@ -257,9 +275,9 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
     tags=["Check Database"],
     summary="Get products of laptop spac by product_id",
     status_code=status.HTTP_200_OK,)
-async def read_user(product_id: int, db: Session = Depends(get_db)):
+async def read_user(product_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(models.Specifications_laptop).filter(models.Specifications_laptop.product_id == product_id)
+    select(models.Specifications_laptop).filter(models.Specifications_laptop.product_id == product_id)
     )
     laptop_result = result.scalars().all()  # 첫 번째 결과 반환 또는 None
     if not laptop_result:
@@ -270,9 +288,9 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
     tags=["Check Database"],
     summary="Get products of smartphone spac by product_id",
     status_code=status.HTTP_200_OK,)
-async def read_user(product_id: int, db: Session = Depends(get_db)):
+async def read_user(product_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(models.Specifications_smartphone).filter(models.Specifications_smartphone.product_id == product_id)
+    select(models.Specifications_smartphone).filter(models.Specifications_smartphone.product_id == product_id)
     )
     smartphone_result = result.scalars().all()  # 첫 번째 결과 반환 또는 None
     if not smartphone_result:
@@ -283,9 +301,9 @@ async def read_user(product_id: int, db: Session = Depends(get_db)):
     tags=["Check Database"],
     summary="Get products of tabletpc spac by product_id",
     status_code=status.HTTP_200_OK,)
-async def read_user(product_id: int, db: Session = Depends(get_db)):
+async def read_user(product_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(models.Specifications_tabletpc).filter(models.Specifications_tabletpc.product_id == product_id)
+    select(models.Specifications_tabletpc).filter(models.Specifications_tabletpc.product_id == product_id)
     )
     tabletpc_result = result.scalars().all()  # 첫 번째 결과 반환 또는 None
     if not tabletpc_result:
@@ -324,17 +342,7 @@ async def process_item(item: Item):
     # 클라이언트에서 받은 데이터를 처리 후 반환
     return {"message": f"Received {item.name} with value {item.value}"}
 
-##############################################################################################
-
-# Pydantic 모델 정의
-class TitleCreate(BaseModel):
-    title: str
-
-from fastapi import FastAPI, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.exc import IntegrityError
-from pydantic import BaseModel
+#############################################################################################
 
 # 블로그 제목 저장 API
 @app.post("/blog/title", status_code=status.HTTP_201_CREATED)
@@ -361,11 +369,8 @@ async def create_title(title_data: TitleCreate, db: AsyncSession = Depends(get_d
 
 ##############################################################################################
 
-import requests
-from sqlalchemy.orm import Session
-from app.common.consts import API_GATEWAY_URL, BUCKET_NAME
-# from app.common.config import get_s3_client
-from sqlalchemy import func
+# aws api gateway와 content 연결
+
 
 # # AWS S3 클라이언트
 # s3_client = get_s3_client()
@@ -381,6 +386,8 @@ class BlogContent(BaseModel):
 
 @app.post("/blog/content")
 async def upload_blog(blog: BlogContent , db: AsyncSession = Depends(get_db)): # ,image_data: Optional[UploadFile] =File(None)
+    print(f"Received blog data: {blog}")  # 추가된 로그
+    print(f"Database session: {db}")  # db 세션 확인
     # 블로그 포스트 저장
     if not blog.blocks:  # 블록이 비어있는지 확인
         raise HTTPException(status_code=400, detail="No blocks provided")
@@ -404,3 +411,133 @@ async def upload_blog(blog: BlogContent , db: AsyncSession = Depends(get_db)): #
             "block_type":new_block.block_type,  # 반복문 내에서 block.block_type로 접근
             "content":new_block.content,        # 반복문 내에서 block.content로 접근
             "block_order":new_block.block_order}
+
+            # elif block.block_type == "image":
+            #     try:
+            #         # Base64 디코딩 및 S3 업로드
+            #         # image_data = base64.b64decode(block.content)  # Base64 디코딩
+            #         file_name = f"blog/{blog.post_id}/{idx}.png"  # S3에 저장할 경로
+            #         s3_client.put_object(
+            #             Bucket=BUCKET_NAME,
+            #             Key=file_name,
+            #             Body=image_data,
+            #             ContentType="image/png",
+            #         )
+
+            #         # S3 URL 생성
+            #         image_url = f"https://{BUCKET_NAME}.s3.{REGION_NAME}.amazonaws.com/{file_name}"
+
+            #         # 데이터베이스에 저장
+            #         new_block = models.ContentBlock(
+            #             post_id=blog.post_id,
+            #             block_type=block.block_type,
+            #             content=image_url,  # S3 URL 저장
+            #             block_order=idx,
+            #         )
+            #         db.add(new_block)
+            #     except (NoCredentialsError, PartialCredentialsError) as e:
+            #         raise HTTPException(status_code=500, detail="S3 credentials error")
+            #     except Exception as e:
+            #         raise HTTPException(status_code=500, detail=f"Failed to upload image: {e}")
+
+
+@app.post("/upload-image-to-base64/")
+async def upload_image(file: UploadFile = File(...)):
+    image_data = file.file.read()
+    encoded_image = base64.b64encode(image_data).decode("utf-8")
+    # 파일 정보를 출력
+    return encoded_image
+    # {
+    #     "filename": file.filename,
+    #     "content_type": file.content_type,
+    #     "size": len(await file.read())
+    # }
+
+# import requests
+# import base64
+# from fastapi import HTTPException
+
+# @app.post("/upload-image-to-lambda/")
+# async def upload_image(file: UploadFile = File(...)):
+#     # Lambda 호출 코드
+#     image_keys = []
+#     # 이미지 데이터를 Base64로 인코딩
+#     image_data = file.file.read()
+#     encoded_image = base64.b64encode(image_data).decode("utf-8")
+
+#     # Lambda 호출
+#     response = requests.post(
+#         API_GATEWAY_URL,
+#         json={
+#             "body": encoded_image,
+#             "isBase64Encoded": True
+#         },
+#         headers={"filename": file.filename},
+#         params={"bucket": BUCKET_NAME}
+#     )
+
+#     if response.status_code != 200:
+#         raise HTTPException(status_code=500, detail=f"Lambda error: {response.text}")
+
+#     # Lambda가 반환한 S3 URL
+#     s3_url = response.json()["s3_url"]
+#     image_keys.append(s3_url)
+    
+#     return {
+#         "s3_rul":s3_url,
+#         "image_keys": image_keys,
+#         "json": {
+#             "body": encoded_image,
+#             "isBase64Encoded": True
+#         },
+#         "headers": {"filename": file.filename},
+#         "params": {"bucket": BUCKET_NAME},
+#     }
+
+
+# @app.post("/upload-image-to-base64-testmodel/")
+# async def upload_image(file: UploadFile = File(...), db: Session = Depends(get_db)):
+#     try:
+#         image_data = file.file.read()
+#         encoded_image = base64.b64encode(image_data).decode("utf-8") # Base64 디코딩
+#         file_name = f"blog/content/testfile.png"  # S3에 저장할 경로
+#         s3_client.put_object(
+#             Bucket=BUCKET_NAME,
+#             Key=file_name,
+#             Body=encoded_image,
+#             ContentType="image/png",
+#         )
+
+#         # S3 URL 생성
+#         image_url = f"https://{BUCKET_NAME}.s3.{REGION_NAME}.amazonaws.com/{file_name}"
+
+#         # 데이터베이스에 저장
+#         new_block = models.ContentBlock(
+#             post_id="1",
+#             block_type="image",
+#             content=image_url,  # S3 URL 저장
+#             block_order=0,
+#         )
+#         db.add(new_block)
+
+#     except (NoCredentialsError, PartialCredentialsError) as e:
+#         raise HTTPException(status_code=500, detail="S3 credentials error")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Failed to upload image: {e}")
+
+#     try:
+#         db.commit()
+#         print("commit complete!")
+#         return {
+#         "s3_rul":image_url,
+#         "json": {
+#             "body": encoded_image,
+#             "isBase64Encoded": True
+#         },
+#         "headers": {"filename": file.filename},
+#         "params": {"bucket": BUCKET_NAME},
+#     }
+
+#     except Exception as e:
+#         db.rollback()
+#         raise HTTPException(status_code=500, detail=str(e))

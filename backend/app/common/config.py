@@ -1,13 +1,8 @@
+from app.common.consts import REGION_NAME
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from app.common.consts import REGION_NAME
 import boto3
 
 def get_parameter(name, with_decryption=True):
@@ -53,7 +48,3 @@ AsyncSessionLocal = sessionmaker(
     expire_on_commit=False
 )
 Base = declarative_base()
-
-# async def get_db():
-#     async with AsyncSessionLocal() as session:
-#         yield session
