@@ -1,8 +1,11 @@
 import React from "react"
-
+import contact from "../assets/img/contactus.png";
 const Profile = () => {
     return (
-        <div style={styles.container}>Profile Page</div>
+        <div style={styles.container}>
+            profile
+        </div>
+        
     );
     
 }

@@ -79,7 +79,7 @@ const styles = {
         marginTop: "20px"
     },
     blogHeader: {
-        borderBottom: "1.5px solid #F1D1A3",
+        borderBottom: "2px solid #F1D1A3",
         paddingBottom: "10px",
         marginBottom: "20px",
        

@@ -46,7 +46,7 @@ const TopNav = () => {
                         eXflu;
                     </Link>
                     <div style={styles.navLinks}>
-                        {["profile", "blog", "contact "].map((text) => (
+                        {["profile", "blog", "contact"].map((text) => (
                             <Link
                                 key={text}
                                 to={`/${text.replace(/\s/g, "-")}`}

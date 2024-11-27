@@ -2,7 +2,7 @@ import React, {useState} from "react";
 
 
 
-const Comment = ({ comments, onEdit }) => {
+const CommentList = ({ comments, onEdit }) => {
     const styles = {
         commentItem: {
             display: "flex",
@@ -48,9 +48,9 @@ const Comment = ({ comments, onEdit }) => {
                     </div>
                     <button
                         style={styles.editButton}
-                        onClick={() => onEdit(comment.id)}
+                        onClick={() => onEdit(comment.id, comment.writer, comment.password)}
                     >
-                        수정 하기
+                        삭제 하기
                     </button>
                 </div>
             ))}
@@ -58,4 +58,4 @@ const Comment = ({ comments, onEdit }) => {
     );
 };
 
-export default Comment;
+export default CommentList;
