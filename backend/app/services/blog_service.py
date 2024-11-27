@@ -3,9 +3,11 @@ from app.database.models import BlogPost, ContentBlock
 from typing import Optional
 from app.common.consts import BUCKET_NAME, REGION_NAME
 from app.common.config import s3_client
+from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
+from app.common.utils import is_valid_file_type
 # from app.common.config import get_s3_client
 # # AWS S3 클라이언트
 # s3_client = get_s3_client()
@@ -48,13 +50,23 @@ async def send_title_data_to_DB(title_data: TitleCreate, db: AsyncSession):
 5. 위의 post_id에는 제목이 들어가게 된다.
 '''
 
-
 async def process_blog_data(blog, image_data_list, db: AsyncSession):
     try:
-        # BlogPost 생성
-        new_blog_post = BlogPost(title=f"Blog {blog.post_id}")
-        db.add(new_blog_post)
-        await db.flush()
+        # 기존 BlogPost 확인 및 업데이트
+        existing_blog_post = await db.execute(
+            select(BlogPost).where(BlogPost.post_id == blog.post_id)
+        )
+        existing_blog_post = existing_blog_post.scalar_one_or_none()
+
+        if existing_blog_post:
+            # 기존 글 수정
+            existing_blog_post.title = f"Blog {blog.post_id}"  # 필요한 필드만 업데이트
+            new_blog_post = existing_blog_post
+        else:
+            # 새로운 글 생성
+            new_blog_post = BlogPost(title=f"Blog {blog.post_id}")
+            db.add(new_blog_post)
+            await db.flush()
 
         # 이미지 파일 인덱스
         image_index = 0
@@ -77,10 +89,19 @@ async def process_blog_data(blog, image_data_list, db: AsyncSession):
                 # S3 업로드
                 image_file = image_data_list[image_index]
                 image_index += 1
+                
+                # 파일 검증
+                if not is_valid_file_type(image_file):
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Invalid file type for block {block.block_order}. Only JPG or PNG files are allowed.",
+                    )
+                
+                # S3 업로드
                 s3_key = f"blogs/{new_blog_post.post_id}/{block.block_order}.png"
                 s3_client.upload_fileobj(image_file.file, BUCKET_NAME, s3_key)
                 s3_url = f"https://{BUCKET_NAME}.s3.{REGION_NAME}.amazonaws.com/{s3_key}"
-
+                
                 # 블록 저장
                 new_block = ContentBlock(
                     post_id=new_blog_post.post_id,
