@@ -2,6 +2,9 @@
 fastapi[standard]  # 표준 FastAPI 설치 (fastapi + 추가 패키지 포함)
 uvicorn            # ASGI 서버
 fastapi-health     # Health Check를 위한 FastAPI 모듈
+datetime
+typing
+requests
 
 # 데이터베이스
 sqlalchemy         # ORM
