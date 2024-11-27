@@ -1,12 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-
 const TopNav = () => {
-
     const [hoveredLink, setHoveredLink] = useState(null); // 현재 호버된 링크
     const [hoveredLogo, setHoveredLogo] = useState(false); // 로고 호버 상태
     const [hoveredIcon, setHoveredIcon] = useState(false); // 아이콘 호버 상태
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth); // 화면 너비 상태
+
+    // 화면 크기 변경 감지
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    // 동적으로 크기 반환
+    const getFontSize = (baseSize) => {
+        if (windowWidth < 768) return baseSize * 0.8;
+        if (windowWidth < 480) return baseSize * 0.6;
+        return baseSize;
+    };
+
+    const getGap = () => {
+        if (windowWidth < 768) return "20px"; // 모바일 환경에서 간격 축소
+        return "80px"; // PC 환경에서 간격 유지
+    };
 
     const handleMouseEnter = (link) => {
         setHoveredLink(link); // 호버된 링크 설정
@@ -34,27 +52,33 @@ const TopNav = () => {
 
     return (
         <div style={styles.container}>
-            {/* 네비게이션 바 */}
             <div style={styles.navbar}>
                 <div style={styles.navbarContent}>
+                    {/* 로고 */}
                     <Link
                         to="/"
-                        style={hoveredLogo ? { ...styles.logo, ...styles.logoHover } : styles.logo}
+                        style={{
+                            ...styles.logo,
+                            fontSize: `${getFontSize(2)}rem`, // 동적으로 글자 크기 설정
+                            ...(hoveredLogo ? styles.logoHover : {}),
+                        }}
                         onMouseEnter={handleLogoMouseEnter}
                         onMouseLeave={handleLogoMouseLeave}
                     >
                         eXflu;
                     </Link>
-                    <div style={styles.navLinks}>
+
+                    {/* 네비게이션 링크 */}
+                    <div style={{ ...styles.navLinks, gap: getGap() }}>
                         {["profile", "blog", "contact"].map((text) => (
                             <Link
                                 key={text}
-                                to={`/${text.replace(/\s/g, "-")}`}
-                                style={
-                                    hoveredLink === text
-                                        ? { ...styles.link, ...styles.linkHover }
-                                        : styles.link
-                                }
+                                to={`/${text}`}
+                                style={{
+                                    ...styles.link,
+                                    fontSize: `${getFontSize(1.2)}rem`,
+                                    ...(hoveredLink === text ? styles.linkHover : {}),
+                                }}
                                 onMouseEnter={() => handleMouseEnter(text)}
                                 onMouseLeave={handleMouseLeave}
                             >
@@ -62,89 +86,94 @@ const TopNav = () => {
                             </Link>
                         ))}
                     </div>
+
+                    {/* 아이콘 */}
                     <a
                         href="https://www.instagram.com"
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={hoveredIcon ? { ...styles.icon, ...styles.iconHover } : styles.icon}
+                        style={{
+                            ...styles.icon,
+                            ...(hoveredIcon ? styles.iconHover : {}),
+                        }}
                         onMouseEnter={handleIconMouseEnter}
                         onMouseLeave={handleIconMouseLeave}
                     >
                         <img
                             src="https://img.icons8.com/ios-glyphs/30/000000/instagram-new.png"
-                            alt="Instagram" style={styles.iconsize}
+                            alt="Instagram"
+                            style={{
+                                ...styles.iconsize,
+                                width: `${getFontSize(2.5)}rem`,
+                                height: `${getFontSize(2.5)}rem`,
+                            }}
                         />
                     </a>
                 </div>
                 {/* 가로선 */}
-                <div style={styles.navbarLine}></div>
+                <div style={styles.contentLine}></div>
             </div>
         </div>
     );
 };
+
 const styles = {
-    
-    
+    container: {
+        width: "100%",
+    },
     navbar: {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         backgroundColor: "#fffaea",
-        padding: "5px 0", // 패딩을 줄여 높이를 얇게 조정
+        padding: "5px 0",
         width: "100%",
-        height: "70px", // 네비게이션 바의 높이 축소
         boxSizing: "border-box",
-        position: "relative", // 선 고정을 위한 부모 요소 설정
+        position: "relative",
     },
-    
     navbarContent: {
-    
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         width: "95%",
-       
         boxSizing: "border-box",
-        height: "50px", // 내용 높이를 축소하여 더 얇게
+        flexWrap: "wrap", // 줄바꿈 허용
     },
-    navbarLine: {
+    contentLine: {
         width: "95%",
-      
-        height: "1px", // 선의 두께를 줄여 더 깔끔하게
+        height: "1.5px",
+        backgroundColor: "#F1D1A3",
         boxShadow: `
             0px 2px 15px rgba(212, 165, 98, 0.9), 
             0px 4px 30px rgba(212, 165, 98, 0.7)
         `,
-        backgroundColor: "#F1D1A3",
         position: "absolute",
         bottom: 0,
     },
     logo: {
-        fontSize: "2rem", // 로고 크기를 줄여 네비바 높이에 맞춤
+        fontSize: "2rem",
         fontWeight: "bold",
         textDecoration: "none",
         color: "#000",
         transition: "all 0.3s ease-in-out",
-        background: "linear-gradient(to bottom, #3F201F, #A57451)", // 그라데이션 효과
-        WebkitBackgroundClip: "text", // 텍스트에만 적용
-        WebkitTextFillColor: "transparent", // 텍스트 내부를 투명하게
+        background: "linear-gradient(to bottom, #3F201F, #A57451)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
     },
     logoHover: {
-        fontSize: "2.4rem", // 호버 시 크기 조금만 증가
+        fontSize: "2.4rem",
         color: "lightgray",
     },
     navLinks: {
         display: "flex",
-        gap: "50px", // 링크 간 간격을 줄여 간결하게
         alignItems: "center",
     },
     link: {
         textDecoration: "none",
         color: "#000",
-        padding: 5, // 패딩을 줄여 높이 최적화
-        fontSize: "1.2rem", // 글씨 크기를 줄여 균형 맞춤
+        padding: 5,
+        fontSize: "1.2rem",
         transition: "all 0.3s ease-in-out",
-        marginRight: "20px"
     },
     linkHover: {
         fontSize: "1.4rem",
@@ -152,21 +181,16 @@ const styles = {
         fontWeight: "bold",
     },
     icon: {
-        width: "45px",
-        height: "40px",
         display: "flex",
         alignItems: "center",
         transition: "all 0.3s ease-in-out",
     },
     iconHover: {
-        transform: "scale(1.1)", // 호버 시 크기 살짝만 증가
-        fontSize: "2rem"
+        transform: "scale(1.1)",
     },
     iconsize: {
         marginTop: "5px",
-        width: "40px"
-    }
+    },
 };
-
 
 export default TopNav;

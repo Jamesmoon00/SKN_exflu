@@ -54,7 +54,7 @@ const styles = {
     },
     image: {
         display: "flex",
-        width: "400px",
+        width: "20%",
         height: "auto",
         marginLeft: "20px",
         marginBottom: "10px",
@@ -68,7 +68,7 @@ const styles = {
         width: "80%",
     },
     card: {
-        width: "300px",
+        width: "25%",
         height: "400px",
         backgroundColor: "#FFFEF9",
         borderRadius: "15px",

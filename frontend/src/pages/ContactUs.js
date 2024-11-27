@@ -73,9 +73,10 @@ const styles = {
         justifyContent: "center",
     },
     logoImage: {
-        width: "700px",
+
+        width: "50%",
         height: "auto",
-        display: "block",
+        display: "flex",
     },
     buttonContainer: {
         display: "flex",

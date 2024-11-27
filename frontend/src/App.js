@@ -43,6 +43,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     backgroundColor: "#fffaea",
+    overflowX: "hidden", // 가로 스크롤 방지
   },
   
   pageContent: {

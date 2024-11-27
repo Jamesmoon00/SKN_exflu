@@ -6,7 +6,7 @@ import SideCard from "../components/board/SideCard";
 
 const Blog = () => {
     const [posts, setPosts] = useState([]); // 게시글 데이터를 저장할 상태
-
+    const [showSideCard, setShowSideCard] = useState(true); // SideCard 표시 여부 상태
     useEffect(() => {
         // 서버에서 데이터 가져오기
         const fetchPosts = async () => {
@@ -22,15 +22,27 @@ const Blog = () => {
         fetchPosts(); // 함수 호출
     }, []); // 컴포넌트가 마운트될 때 한 번 실행
 
+    useEffect(() => {
+        const handleResize = () => {
+            setShowSideCard(window.innerWidth > 1000); // 768px 이하일 때 SideCard 숨김
+        };
+
+        handleResize(); // 초기 크기 설정
+        window.addEventListener("resize", handleResize); // 리사이즈 이벤트 추가
+        return () => window.removeEventListener("resize", handleResize); // 이벤트 제거
+    }, []);
+
+
     return (
-        <div style={styles.container}>
+        <div
+            style={{
+                ...styles.container,
+                marginLeft: showSideCard ? "45px" : "0", // SideNav가 없으면 marginLeft를 0으로 설정
+            }}
+        >
             {/* 왼쪽 사이드바 */}
-            {/* <div style={styles.sidebar}>
-                <img src={profileImage} alt="Profile" style={styles.profileImage} />
-                <h2 style={styles.blogTitle}>Eddy's Blog</h2>
-                <p style={styles.description}>Welcome to my blog!</p>
-            </div> */}
-            <SideCard />
+            {/* SideCard는 showSideCard가 true일 때만 렌더링 */}
+            {showSideCard && <SideCard />}
             {/* 오른쪽 게시글 리스트 */}
             <div style={styles.blogList}>
                 <div style={styles.blogHeader}>
@@ -71,7 +83,9 @@ const styles = {
         backgroundColor: "#fffaea",
         height: "100vh",
     },
-    
+    sideCard: {
+        width: "25%",
+    },
     blogList: {
         flex: "2.5",
         marginLeft: "40px",

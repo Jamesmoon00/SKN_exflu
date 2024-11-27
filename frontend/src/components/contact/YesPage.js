@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import SideCard from "./ContactSidecard";
 import question from "../../assets/img/question.png";
 import Snowfall from "react-snowfall";
@@ -26,14 +26,35 @@ const YesPage = () => {
             options: ["남성", "여성", "무관"],
         },
     ];
+    const [showSideCard, setShowSideCard] = useState(true);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setShowSideCard(window.innerWidth > 1000); // 768px 이하일 때 SideCard 숨김
+        };
+
+        handleResize(); // 초기 크기 설정
+        window.addEventListener("resize", handleResize); // 리사이즈 이벤트 추가
+        return () => window.removeEventListener("resize", handleResize); // 이벤트 제거
+    }, []);
 
     return (
-        <div style={styles.container}>
+        <div
+            style={{
+                ...styles.container,
+                marginLeft: showSideCard ? "45px" : "0", // SideNav가 없으면 marginLeft를 0으로 설정
+            }}
+        >
             {/* Side Card UI */}
-            <SideCard />
+            {showSideCard && <SideCard />}
 
             {/* 질문 폼 */}
-            <div style={styles.post}>
+            <div
+                style={{
+                    ...styles.post,
+                    flex: showSideCard ? "2.5" : "3.5", // SideCard가 없을 때 너비 확장
+                }}
+            >
                 <Snowfall
                     color="white" // 눈 색상
                     snowflakeCount={150} // 눈송이 개수
@@ -75,6 +96,9 @@ const styles = {
         backgroundColor: "#fffaea",
         minHeight: "100vh",
         justifyContent: "space-between", // 좌우 요소 간 여백 균일화
+    },
+    sideCard: {
+        width: "25%",
     },
     post: {
         flex: "2.5",

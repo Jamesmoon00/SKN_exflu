@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import profileImage from "../assets/img/eddy_profile.png";
 import bombImage from "../assets/img/bomb_eddy.png";
 import hearticon from "../assets/icons/heart.png";
@@ -8,12 +8,12 @@ import SideCard from "./board/SideCard";
 import Comment from "./board/CommentList";
 import CommentForm from "./board/CommentForm";
 
-
 const Write = () => {
     const [comments, setComments] = useState([]);
     const [writer, setWriter] = useState("");
     const [password, setPassword] = useState("");
     const [content, setContent] = useState("");
+    const [showSideCard, setShowSideCard] = useState(true); // SideCard 표시 여부 상태
 
     const handleAddComment = () => {
         if (!writer || !content) {
@@ -33,14 +33,8 @@ const Write = () => {
     };
 
     const handleEditComment = (id, writer, password) => {
-        console.log("현재 작성자:", writer);
-        console.log("현재 비밀번호:", password);
-
-        const newWriter = prompt("작성자를 입력하세요:", ""); // 빈 문자열로 기본값 설정
-        const newPassword = prompt("비밀번호를 입력하세요:", ""); // 빈 문자열로 기본값 설정
-
-        console.log("입력된 작성자:", newWriter);
-        console.log("입력된 비밀번호:", newPassword);
+        const newWriter = prompt("작성자를 입력하세요:", ""); 
+        const newPassword = prompt("비밀번호를 입력하세요:", ""); 
 
         if (newWriter === writer && newPassword === password) {
             setComments((prevComments) =>
@@ -48,19 +42,37 @@ const Write = () => {
             );
             alert("댓글이 삭제되었습니다.");
         } else {
-            alert("작성자와 비밀번호가 일치하지 않거나 수정되었습니다.");
+            alert("작성자와 비밀번호가 일치하지 않습니다.");
         }
     };
 
-    return (
-        <div style={styles.container}>
-            {/* side card UI */}
-            <SideCard />
+    useEffect(() => {
+        const handleResize = () => {
+            setShowSideCard(window.innerWidth > 1000); // 768px 이하일 때 SideCard 숨김
+        };
 
+        handleResize(); // 초기 크기 설정
+        window.addEventListener("resize", handleResize); // 리사이즈 이벤트 추가
+        return () => window.removeEventListener("resize", handleResize); // 이벤트 제거
+    }, []);
+
+    return (
+        <div
+            style={{
+                ...styles.container,
+                marginLeft: showSideCard ? "45px" : "0", // SideNav가 없으면 marginLeft를 0으로 설정
+            }}
+        >
+            {/* SideCard는 showSideCard가 true일 때만 렌더링 */}
+            {showSideCard && <SideCard />}
+    
             {/* 게시글 박스 UI */}
-            <div style={styles.post}>
-                
-                {/* 에디 프로필 */}
+            <div
+                style={{
+                    ...styles.post,
+                    flex: showSideCard ? "2.5" : "3.5", // SideCard가 없을 때 너비 확장
+                }}
+            >
                 <div style={styles.postHeader}>
                     <img src={profileImage} alt="" style={styles.profileImage} />
                     <div style={styles.authorInfo}>
@@ -68,15 +80,15 @@ const Write = () => {
                         <p style={styles.postDate}>2024-11-15</p>
                     </div>
                 </div>
-
-                {/* 이미지 영역 */}
+    
                 <div style={styles.Imagecontainer}>
                     <img src={bombImage} alt="Character Scene" style={styles.image} />
                 </div>
-
-                {/* 작성글 부분 */}
+    
                 <div style={styles.contentbox}>
-                    <p style={styles.content}>오늘 뽀로로🐧한테 골탕먹이려다가 폭탄맞음;;;; 뽀로로뽀로로뽀로로뽀로로</p>
+                    <p style={styles.content}>
+                        오늘 뽀로로🐧한테 골탕먹이려다가 폭탄맞음;;;; 뽀로로뽀로로뽀로로뽀로로
+                    </p>
                     <button style={styles.button}>
                         <div style={styles.buttonContent}>
                             <img src={hearticon} alt="heart icon" style={styles.icon} />
@@ -84,17 +96,15 @@ const Write = () => {
                         </div>
                     </button>
                 </div>
-
-                {/* 댓글 리스트 */}
+    
                 <div style={styles.commentHeader}>
                     <img src={comment} alt="comment icon" style={styles.commentword} />
                     <p style={styles.commentHeaderText}>comment</p>
                 </div>
                 <div style={styles.contentLine}></div>
-
+    
                 <Comment comments={comments} onEdit={handleEditComment} />
-
-                {/* 댓글 작성 폼 */}
+    
                 <div style={styles.writerHeader}>
                     <img src={commentwrite} alt="comment icon" style={styles.writerword} />
                     <p style={styles.writerHeaderText}>write</p>
@@ -111,7 +121,8 @@ const Write = () => {
             </div>
         </div>
     );
-};
+}    
+
 
 const styles = {
     container: {
@@ -121,8 +132,10 @@ const styles = {
         backgroundColor: "#fffaea",
         minHeight: "100vh",
     },
+    sideCard: {
+        width: "25%",
+    },
     post: {
-        flex: "2.5",
         marginTop: "30px",
         marginLeft: "40px",
         backgroundColor: "#fffdf7",

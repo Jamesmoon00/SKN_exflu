@@ -1,112 +1,101 @@
-import React, { useEffect, useState } from "react";
-import logoImage from "../../assets/img/2nd_logo.png"
-
+import React, { useState, useEffect } from "react";
+import logoImage from "../../assets/img/2nd_logo.png";
 import Snowfall from "react-snowfall";
-// 각 페이지 컴포넌트
-// const Home = () => <div>Home Page</div>;
+
 const FirstSection = () => {
-    const [opacity, setOpacity] = useState(0); // 초기 투명도
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth); // 화면 너비 상태
 
     useEffect(() => {
-        // 페이지 로드 시 점진적으로 투명도를 높이는 애니메이션
-        const interval = setInterval(() => {
-            setOpacity((prevOpacity) => {
-                if (prevOpacity >= 1) {
-                    clearInterval(interval); // 애니메이션 완료 후 중지
-                    return 1;
-                }
-                return prevOpacity + 0.05; // 투명도 증가
-            });
-        }, 50); // 50ms마다 실행
-        return () => clearInterval(interval); // 클린업 함수
+        // 윈도우 크기 변경 이벤트 감지
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
     }, []);
+
+    // 동적으로 글자 크기를 반환하는 함수
+    const getFontSize = (baseSize) => {
+        if (windowWidth < 768) return baseSize * 0.8; // 768px 이하일 때 20% 축소
+        if (windowWidth < 480) return baseSize * 0.6; // 480px 이하일 때 40% 축소
+        return baseSize;
+    };
+
     return (
-        <>
-            <div style={styles.container}>
-                {/* 눈 내리는 효과 */}
-                <Snowfall
-                    color="white" // 눈 색상
-                    snowflakeCount={150} // 눈송이 개수
-                    style={{ zIndex: 9999 }} // 눈이 모든 요소 위에 표시되도록 설정
-                />
+        <div style={styles.container}>
+            {/* 눈 내리는 효과 */}
+            <Snowfall
+                color="white" // 눈 색상
+                snowflakeCount={150} // 눈송이 개수
+                style={{ zIndex: 9999 }} // 눈이 모든 요소 위에 표시되도록 설정
+            />
 
-                {/* 로고 섹션 */}
-                <section style={styles.logoSection}>
-                    <img src={logoImage} alt="eXflu" style={{ ...styles.logoImage, opacity }} />
-                </section>
+            {/* 로고 섹션 */}
+            <section style={styles.logoSection}>
+                <img src={logoImage} alt="eXflu" style={styles.logoImage} />
+            </section>
 
-                {/* 설명 섹션 */}
-                <section style={styles.descriptionSection}>
-                    <h2 style={styles.animatedText}>AI influencer</h2>
-                    <p style={styles.description}>
+            {/* 설명 섹션 */}
+            <section style={styles.descriptionSection}>
+                <h2
+                    style={{
+                        ...styles.animatedText,
+                        fontSize: `${getFontSize(2.5)}rem`, // 동적으로 글자 크기 설정
+                    }}
+                >
+                    AI influencer
+                </h2>
+                <p
+                    style={{
+                        ...styles.description,
+                        fontSize: `${getFontSize(1)}rem`, // 동적으로 글자 크기 설정
+                    }}
+                >
                     This is a description. this is a description
-                    </p>
-                </section>
-            </div>
-        </>
-        
+                </p>
+            </section>
+        </div>
     );
-}
+};
 
 const styles = {
     container: {
         position: "relative",
         width: "100%",
         height: "100vh",
-        overflow: "hidden", // 눈송이가 컨테이너 밖으로 나가지 않도록 설정
+        overflowX: "hidden", // 가로 스크롤 방지
         backgroundColor: "#fffaea",
         background: "linear-gradient(to bottom, #FFFAEA, #FFEFB9)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center", // 수직 및 수평 중앙 정렬
     },
     logoSection: {
-        marginTop: "200px",
-        display: "flex"
+        marginBottom: "20px",
+        display: "flex",
+        justifyContent: "center",
     },
     logoImage: {
-        width: "700px",
+        width: "50%",
         height: "auto",
         display: "block",
-        margin: "0 auto",
-        alignItems: "center",
-        transition: "opacity 3s ease-in-out",
-       
-    },
-    bannerSection: {
-        marginTop: "100px",
-        position: "absolute",
-        width:"100%",
-    
-    },
-    bannerImage: {
-        width: "100%",
-        height: "auto",
-        objectFit: "cover",
-        height: "auto",
-        bottom: "0px",
-        opacity: 0.8, 
     },
     descriptionSection: {
-        marginTop: "70px",
         textAlign: "center",
     },
     animatedText: {
-        fontSize: "2.5rem",
         fontWeight: "bold",
         margin: "5px 0",
         animation: "colorChange 3s infinite", // 애니메이션 적용
     },
     description: {
-        fontSize: "1rem",
         color: "#555",
         margin: 0,
     },
 };
-
-// 애니메이션 스타일 추가
-// #DE9D9B : 죽은 연한 팥색
-// #D09593 : 연보라
-// #BF8D8B : 하늘
-// #B88887 : 민트
-// #9B706E
 const globalStyle = `
 @keyframes colorChange {
     0% { color: #CD9167; }
@@ -123,4 +112,4 @@ const addGlobalStyle = () => {
 };
 
 addGlobalStyle();
-export default FirstSection
+export default FirstSection;
