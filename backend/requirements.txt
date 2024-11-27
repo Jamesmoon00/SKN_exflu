@@ -5,6 +5,7 @@ fastapi-health     # Health Check를 위한 FastAPI 모듈
 datetime
 typing
 requests
+python-multipart
 
 # 데이터베이스
 sqlalchemy         # ORM

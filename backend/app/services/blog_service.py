@@ -1,6 +1,8 @@
-from app.schemas.blog import TitleCreate, BlogContent
+from app.schemas.blog import TitleCreate
 from app.database.models import BlogPost, ContentBlock
 from typing import Optional
+from app.common.consts import BUCKET_NAME, REGION_NAME
+from app.common.config import s3_client
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
@@ -23,57 +25,73 @@ async def send_title_data_to_DB(title_data: TitleCreate, db: AsyncSession):
         )
     return {"id": new_title.post_id, "title": new_title.title, "created_at": new_title.created_at}
 
-async def send_blog_content_data_to_DB(blog: BlogContent , db: AsyncSession): # ,image_data: Optional[UploadFile] =File(None)
-    # print(f"Received blog data: {blog}")  # 추가된 로그
-    # print(f"Database session: {db}")  # db 세션 확인
-    # 블로그 포스트 저장
-    if not blog.blocks:  # 블록이 비어있는지 확인
-        raise HTTPException(status_code=400, detail="No blocks provided")
+'''
+아래 process_blog_data에 입력하기 위한 string 셋은 아래와 같아
+
+{
+  "post_id": 1,
+  "blocks": [
+    {"block_type": "text", "content": "This is a text block", "block_order": 0},
+    {"block_type": "image", "content": "image1", "block_order": 1},
+    {"block_type": "text", "content": "This is another text block", "block_order": 2},
+    {"block_type": "image", "content": "image2", "block_order": 3}
+  ]
+}
+
+
+왜 이렇게 string으로 처리해야 하는가?
+
+1. 파일 업로드 기능이 있어서 application/json으로 인식하지 않고 multipart/form-data로 인식함
+2. 라우터에서 인식된 input은 string의 형식을 가지므로 라우터에서 json으로 변환이 필요하다
+3. 그렇다면 input으로 넣는 string에서 미리 json에 맞게 데이터를 넣어줘야 한다.
+4. 따라서 위와 같은 형식의 글이 작성되게 된다.
+5. 위의 post_id에는 제목이 들어가게 된다.
+'''
+
+
+async def process_blog_data(blog, image_data_list, db: AsyncSession):
     try:
-        for idx, block in enumerate(blog.blocks):
+        # BlogPost 생성
+        new_blog_post = BlogPost(title=f"Blog {blog.post_id}")
+        db.add(new_blog_post)
+        await db.flush()
+
+        # 이미지 파일 인덱스
+        image_index = 0
+
+        for block in blog.blocks:
             if block.block_type == "text":
+                # 텍스트 블록 처리
                 new_block = ContentBlock(
-                    post_id=blog.post_id,
-                    block_type=block.block_type,  # 반복문 내에서 block.block_type로 접근
-                    content=block.content,        # 반복문 내에서 block.content로 접근
-                    block_order=idx               # 반복문 내에서 idx 사용
+                    post_id=new_blog_post.post_id,
+                    block_type="text",
+                    content=block.content,
+                    block_order=block.block_order,
                 )
                 db.add(new_block)
-                await db.flush()  # DB에 추가된 상태 유지
-                await db.refresh(new_block)  # 새 블록의 상태 갱신
+            elif block.block_type == "image":
+                # 이미지 블록 처리
+                if image_index >= len(image_data_list):
+                    raise HTTPException(status_code=400, detail=f"Image file missing for block {block.block_order}")
+                
+                # S3 업로드
+                image_file = image_data_list[image_index]
+                image_index += 1
+                s3_key = f"blogs/{new_blog_post.post_id}/{block.block_order}.png"
+                s3_client.upload_fileobj(image_file.file, BUCKET_NAME, s3_key)
+                s3_url = f"https://{BUCKET_NAME}.s3.{REGION_NAME}.amazonaws.com/{s3_key}"
+
+                # 블록 저장
+                new_block = ContentBlock(
+                    post_id=new_blog_post.post_id,
+                    block_type="image",
+                    content=s3_url,
+                    block_order=block.block_order,
+                )
+                db.add(new_block)
+
         await db.commit()
+        return {"message": "Blog saved successfully", "blog_id": new_blog_post.post_id}
     except Exception as e:
-        await db.rollback()  # 오류 발생 시 롤백
-        raise HTTPException(status_code=500, detail=f"Failed to save blog blocks: {e}")
-    return {"post_id":new_block.post_id,
-            "block_type":new_block.block_type,  # 반복문 내에서 block.block_type로 접근
-            "content":new_block.content,        # 반복문 내에서 block.content로 접근
-            "block_order":new_block.block_order}
-
-            # elif block.block_type == "image":
-            #     try:
-            #         # Base64 디코딩 및 S3 업로드
-            #         # image_data = base64.b64decode(block.content)  # Base64 디코딩
-            #         file_name = f"blog/{blog.post_id}/{idx}.png"  # S3에 저장할 경로
-            #         s3_client.put_object(
-            #             Bucket=BUCKET_NAME,
-            #             Key=file_name,
-            #             Body=image_data,
-            #             ContentType="image/png",
-            #         )
-
-            #         # S3 URL 생성
-            #         image_url = f"https://{BUCKET_NAME}.s3.{REGION_NAME}.amazonaws.com/{file_name}"
-
-            #         # 데이터베이스에 저장
-            #         new_block = models.ContentBlock(
-            #             post_id=blog.post_id,
-            #             block_type=block.block_type,
-            #             content=image_url,  # S3 URL 저장
-            #             block_order=idx,
-            #         )
-            #         db.add(new_block)
-            #     except (NoCredentialsError, PartialCredentialsError) as e:
-            #         raise HTTPException(status_code=500, detail="S3 credentials error")
-            #     except Exception as e:
-            #         raise HTTPException(status_code=500, detail=f"Failed to upload image: {e}")
+        print(f"Error in process_blog_data: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
