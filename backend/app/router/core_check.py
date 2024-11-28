@@ -5,7 +5,7 @@ from app.database.database import get_db
 
 router = APIRouter(tags=["Check Database"])
 
-@router.get("/productcategories/{category_id}", 
+@router.post("/productcategories/{category_id}", 
     summary="Get product categories",
     status_code=status.HTTP_200_OK,)
 async def check_categories_data(category_id: int, db: AsyncSession = Depends(get_db)):
@@ -16,7 +16,7 @@ async def check_categories_data(category_id: int, db: AsyncSession = Depends(get
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/products/{product_id}", 
+@router.post("/products/{product_id}", 
     summary="Get products info by product_id",
     status_code=status.HTTP_200_OK,)
 async def check_products_data(product_id: int, db: AsyncSession = Depends(get_db)):
@@ -27,7 +27,7 @@ async def check_products_data(product_id: int, db: AsyncSession = Depends(get_db
         raise HTTPException(status_code=500, detail=str(e))
     
 
-@router.get("/specifications_laptop/{product_id}", 
+@router.post("/specifications_laptop/{product_id}", 
     summary="Get products of laptop spac by product_id",
     status_code=status.HTTP_200_OK,)
 async def check_laptop_specificatoin_data(product_id: int, db: AsyncSession = Depends(get_db)):
@@ -39,7 +39,7 @@ async def check_laptop_specificatoin_data(product_id: int, db: AsyncSession = De
     
 
 
-@router.get("/specifications_smartphone/{product_id}",  
+@router.post("/specifications_smartphone/{product_id}",  
     summary="Get products of smartphone spac by product_id",
     status_code=status.HTTP_200_OK,)
 async def check_smartphone_specificatoin_data(product_id: int, db: AsyncSession = Depends(get_db)):
@@ -50,7 +50,7 @@ async def check_smartphone_specificatoin_data(product_id: int, db: AsyncSession 
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/specifications_tabletpc/{product_id}",  
+@router.post("/specifications_tabletpc/{product_id}",  
     summary="Get products of tabletpc spac by product_id",
     status_code=status.HTTP_200_OK,)
 async def check_tabletpc_specificatoin_data(product_id: int, db: AsyncSession = Depends(get_db)):
