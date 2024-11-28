@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
-from typing import Optional
+from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.blog import TitleCreate, BlogContent
-from app.services.blog_service import send_title_data_to_DB, process_blog_data
+from app.schemas.blog import TitleCreate, BlogContent, CommentCreate, CommentResponse
+from app.services.blog_service import send_title_data_to_DB, process_blog_data, get_blog_data_from_DB, create_comment_content, get_comments_contents, delete_comment_data, delete_blog_from_DB, add_like_on_blog_page
 from app.database.database import get_db
 import json
 
@@ -17,15 +17,26 @@ async def create_title(title_data: TitleCreate, db: AsyncSession = Depends(get_d
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/content")
+# 블로그 삭제
+@router.delete("/{post_id}", response_model=dict)
+async def delete_blog(post_id: str, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await delete_blog_from_DB(post_id, db)  # 서비스 로직 호출
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 블로그 내용 저장
+@router.post("/contents")
 async def send_blog_content_data_to_DB(
     blog: str = Form(...),  # JSON 데이터 문자열
-    images: list[UploadFile] = File(...),  # 파일 리스트
+    images: Optional[list[UploadFile]] = File(None),  # 파일 리스트
     db: AsyncSession = Depends(get_db),  # DB 세션
 ):
     try:
         # JSON 파싱
         blog_data = json.loads(blog)
+        print(blog_data)
         blog_content = BlogContent(**blog_data)
     except json.JSONDecodeError:
         raise HTTPException(status_code=422, detail="Invalid JSON format")
@@ -35,3 +46,51 @@ async def send_blog_content_data_to_DB(
     # 비즈니스 로직 처리
     result = await process_blog_data(blog_content, images, db)
     return result
+
+# 블로그 전체 내용 확인
+@router.get("/{post_id}")
+async def get_blog_data(post_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await get_blog_data_from_DB(post_id, db)  # 서비스 로직 호출
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 블로그 글 좋아요
+
+@router.post("/blogs/{post_id}/like", response_model=dict)
+async def add_like(post_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await add_like_on_blog_page(post_id, db)  # 서비스 로직 호출
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# 댓글 작성
+@router.post("/comments", response_model=CommentResponse)
+async def create_comment(comment: CommentCreate, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await create_comment_content(comment, db)  # 서비스 로직 호출
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 댓글 조회(송수신)
+@router.get("/comments/{post_id}", response_model=list[CommentResponse])
+async def get_comments(post_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await get_comments_contents(post_id, db)  # 서비스 로직 호출
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 댓글 삭제
+@router.delete("/comments/{comment_name}", response_model=dict)
+async def delete_comment(comment_name:str, password: str, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await delete_comment_data(comment_name,password, db)  # 서비스 로직 호출
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

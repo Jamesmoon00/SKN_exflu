@@ -1,6 +1,6 @@
 from app.common.config import Base
-from sqlalchemy import Column, Integer, String, Text, Enum, ForeignKey, DateTime
-from datetime import datetime
+from sqlalchemy import Column, Integer, String, Text, Enum, ForeignKey, DateTime, Boolean
+from datetime import datetime, timedelta
 from sqlalchemy.orm import relationship
 
 # BlogPost 모델 정의
@@ -9,13 +9,17 @@ class BlogPost(Base):
 
     post_id = Column(Integer, primary_key=True, index=True)  # 블로그 ID
     title = Column(String(255), nullable=False)  # 블로그 제목
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    views = Column(Integer, default=0)
+    likes = Column(Integer, default=0)
+    is_ad = Column(Boolean, default=False)  # 광고 여부
 
     # 블록 관계 설정
     blocks = relationship("ContentBlock", back_populates="blog_post")
 
 class ContentBlock(Base):
     __tablename__ = "content_blocks"
+    
     block_id = Column(Integer, primary_key=True, index=True)
     post_id = Column(Integer, ForeignKey("blog_posts.post_id"), nullable=False)  # 블로그 ID
     block_type = Column(Enum("text", "image"), nullable=False)
@@ -24,6 +28,17 @@ class ContentBlock(Base):
 
     # BlogPost 관계
     blog_post = relationship("BlogPost", back_populates="blocks")
+
+class BlogComment(Base):
+    __tablename__="blogcomments"
+    
+    comment_id = Column(Integer,primary_key=True, index=True)
+    post_id = Column(Integer, ForeignKey("blog_posts.post_id"), nullable=False)
+    comment_name = Column(String(50), nullable=False)
+    comment_password = Column(String(50), nullable=False)
+    comment_content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    
 
 class ProductCategories(Base):
     __tablename__='ProductCategories'
