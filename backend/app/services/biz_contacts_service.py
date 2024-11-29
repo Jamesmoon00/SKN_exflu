@@ -12,6 +12,7 @@ from app.common.utils import is_valid_file_type, make_pwd_to_hash
 
 async def insert_bizcontacts_data_to_DB(bizinfo_data: BizContactsDataRequests, db: AsyncSession):  # 서비스 로직 호출
     new_bizinfo = BizContacts(
+        biz_key = bizinfo_data.biz_key,
         service_name = bizinfo_data.service_name,
         service_info = bizinfo_data.service_info,
         budget = bizinfo_data.budget,
@@ -19,7 +20,8 @@ async def insert_bizcontacts_data_to_DB(bizinfo_data: BizContactsDataRequests, d
         platform = bizinfo_data.platform,
         promo_info = bizinfo_data.promo_info,
         service_target = bizinfo_data.service_target,
-        service_charactors = bizinfo_data.service_charactors
+        service_charactors = bizinfo_data.service_charactors,
+        category_id = bizinfo_data.category_id
     )
     
     try:

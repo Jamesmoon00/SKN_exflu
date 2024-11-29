@@ -13,7 +13,7 @@ class BizInfo(Base):
     biz_address = Column(String(255), nullable=False)
     biz_phone = Column(String(255), nullable=False)
     biz_manager = Column(String(50), nullable=False)
-    category_id = Column(Integer, ForeignKey("ProductCategories.category_id"))
+    category_id = Column(Integer, ForeignKey("ProductCategories.category_id"), default=999)
     
 class BizContacts(Base):
     __tablename__ = "biz_contacts"
@@ -29,7 +29,7 @@ class BizContacts(Base):
     promo_info = Column(String(255))
     service_target = Column(String(45), nullable=False)
     service_charactors = Column(String(45))
-    category_id = Column(Integer, ForeignKey("ProductCategories.category_id"))
+    category_id = Column(Integer, ForeignKey("ProductCategories.category_id"), default = 999)
 
 # BlogPost 모델 정의
 class BlogPost(Base):
