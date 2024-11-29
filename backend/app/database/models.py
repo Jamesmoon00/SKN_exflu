@@ -3,6 +3,34 @@ from sqlalchemy import Column, Integer, String, Text, Enum, ForeignKey, DateTime
 from datetime import datetime, timedelta
 from sqlalchemy.orm import relationship
 
+# B2B 비즈니스 모델 정의
+class BizInfo(Base):
+    __tablename__ = "biz_info"
+    
+    biz_key = Column(Integer, primary_key=True, index=True)
+    biz_name = Column(String(50), nullable=False)
+    biz_mail = Column(String(50), nullable=False)
+    biz_address = Column(String(255), nullable=False)
+    biz_phone = Column(String(255), nullable=False)
+    biz_manager = Column(String(50), nullable=False)
+    category_id = Column(Integer, ForeignKey("ProductCategories.category_id"))
+    
+class BizContacts(Base):
+    __tablename__ = "biz_contacts"
+    
+    order_id = Column(Integer, primary_key=True, index = True)
+    biz_key = Column(Integer, ForeignKey("biz_info.biz_key"))
+    order_date = Column(DateTime, nullable=False, default=datetime.now() + timedelta(hours=9))
+    service_name = Column(String(50), nullable=False)
+    service_info = Column(String(255), nullable=False)
+    budget = Column(Integer, nullable=False)
+    period = Column(Integer, nullable=False)
+    platform = Column(String(50), nullable=False)
+    promo_info = Column(String(255))
+    service_target = Column(String(45), nullable=False)
+    service_charactors = Column(String(45))
+    category_id = Column(Integer, ForeignKey("ProductCategories.category_id"))
+
 # BlogPost 모델 정의
 class BlogPost(Base):
     __tablename__ = "blog_posts"

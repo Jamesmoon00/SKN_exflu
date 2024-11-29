@@ -1,4 +1,4 @@
-from app.router import blog, core, core_check, process_check, healthcheck, test, sns
+from app.router import blog, core, core_check, process_check, healthcheck, test, sns, biz_info, biz_contacts
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -20,6 +20,8 @@ app.include_router(process_check.router)
 app.include_router(blog.router)
 app.include_router(sns.router)
 app.include_router(core.router)
+app.include_router(biz_info.router)
+app.include_router(biz_contacts.router)
 app.include_router(core_check.router)
 app.include_router(test.router)
 
