@@ -1,4 +1,3 @@
-from matplotlib import category
 from app.schemas.biz_info import BizInfoDataRequests, BizInfoResponse
 from app.database.models import BlogPost, ContentBlock, BlogComment, BizInfo
 from typing import Optional
