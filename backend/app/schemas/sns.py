@@ -2,10 +2,10 @@ from pydantic import BaseModel
 from typing import Literal, List
 from datetime import datetime
 
-class TitleCreate(BaseModel): # DB에서 블로그 제목 저장
+class TitleCreate(BaseModel): # DB에서 sns 제목 저장
     title: str
     
-class ContentBlock(BaseModel): # DB에서 블로그 글 본문 저장
+class ContentBlock(BaseModel): # DB에서 sns 글 본문 저장
     post_id: int
     block_type: str
     content: str
@@ -32,11 +32,11 @@ class Block(BaseModel):
     content: str  # 텍스트 내용 또는 이미지 URL
     block_order: int  # 블록 순서
 
-class BlogContent(BaseModel):
+class SNSContent(BaseModel):
     post_id: int
     is_ad: bool = False  # 광고 여부 기본값 False
     blocks: List[Block]  # 블록들의 리스트
     
-class BlogCommentCountReapone(BaseModel):
+class SNSCommentCountReapone(BaseModel):
     post_id: int
     comments_count: int

@@ -1,5 +1,5 @@
-from app.schemas.blog import TitleCreate, CommentResponse,CommentCreate
-from app.database.models import BlogPost, ContentBlock, BlogComment
+from app.schemas.sns import TitleCreate, CommentResponse,CommentCreate
+from app.database.models import SNSPost, ContentBlockForSNS, SNSComment
 from typing import Optional
 from app.common.consts import BUCKET_NAME, REGION_NAME
 from app.common.config import s3_client
@@ -14,7 +14,7 @@ from app.common.utils import is_valid_file_type
 # s3_client = get_s3_client()
 
 async def send_title_data_to_DB(title_data: TitleCreate, db: AsyncSession):
-    new_title = BlogPost(title=title_data.title)
+    new_title = SNSPost(title=title_data.title)
     try:
         # 데이터베이스에 새 레코드 추가
         db.add(new_title)
@@ -28,9 +28,9 @@ async def send_title_data_to_DB(title_data: TitleCreate, db: AsyncSession):
         )
     return {"id": new_title.post_id, "title": new_title.title, "created_at": new_title.created_at}
 
-async def process_blog_data(blog, image_data_list, db: AsyncSession):
+async def process_sns_data(sns, image_data_list, db: AsyncSession):
     '''
-    아래 process_blog_data에 입력하기 위한 string 셋은 아래와 같아
+    아래 process_sns_data에 입력하기 위한 string 셋은 아래와 같아
 
     {
     "post_id": 1,
@@ -51,29 +51,29 @@ async def process_blog_data(blog, image_data_list, db: AsyncSession):
     5. 위의 post_id에는 제목이 들어가게 된다.
     '''
     try:
-        # 기존 BlogPost 확인 및 업데이트
-        existing_blog_post = await db.execute(
-            select(BlogPost).where(BlogPost.post_id == blog.post_id)
+        # 기존 SNSPost 확인 및 업데이트
+        existing_sns_post = await db.execute(
+            select(SNSPost).where(SNSPost.post_id == sns.post_id)
         )
-        existing_blog_post = existing_blog_post.scalar_one_or_none()
+        existing_sns_post = existing_sns_post.scalar_one_or_none()
 
-        if existing_blog_post:
+        if existing_sns_post:
             # 기존 글 수정
-            new_blog_post = existing_blog_post
+            new_sns_post = existing_sns_post
         else:
             # 새로운 글 생성
-            new_blog_post = BlogPost(title=f"Blog {blog.post_id}")
-            db.add(new_blog_post)
+            new_sns_post = SNSPost(title=f"sns {sns.post_id}")
+            db.add(new_sns_post)
             await db.flush()
 
         # 이미지 파일 인덱스
         image_index = 0
 
-        for block in blog.blocks:
+        for block in sns.blocks:
             if block.block_type == "text":
                 # 텍스트 블록 처리
-                new_block = ContentBlock(
-                    post_id=new_blog_post.post_id,
+                new_block = ContentBlockForSNS(
+                    post_id=new_sns_post.post_id,
                     block_type="text",
                     content=block.content,
                     block_order=block.block_order,
@@ -96,13 +96,13 @@ async def process_blog_data(blog, image_data_list, db: AsyncSession):
                     )
                 
                 # S3 업로드
-                s3_key = f"blogs/{new_blog_post.post_id}/{block.block_order}.png"
+                s3_key = f"sns/{new_sns_post.post_id}/{block.block_order}.png"
                 s3_client.upload_fileobj(image_file.file, BUCKET_NAME, s3_key)
                 s3_url = f"https://{BUCKET_NAME}.s3.{REGION_NAME}.amazonaws.com/{s3_key}"
                 
                 # 블록 저장
-                new_block = ContentBlock(
-                    post_id=new_blog_post.post_id,
+                new_block = ContentBlockForSNS(
+                    post_id=new_sns_post.post_id,
                     block_type="image",
                     content=s3_url,
                     block_order=block.block_order,
@@ -110,50 +110,50 @@ async def process_blog_data(blog, image_data_list, db: AsyncSession):
                 db.add(new_block)
 
         await db.commit()
-        return {"message": "Blog saved successfully", "blog_id": new_blog_post.post_id}
+        return {"message": "sns saved successfully", "sns_id": new_sns_post.post_id}
     except Exception as e:
-        print(f"Error in process_blog_data: {e}")
+        print(f"Error in process_sns_data: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 
-async def get_blog_data_from_DB(post_id: str, db: AsyncSession):
+async def get_sns_data_from_DB(post_id: str, db: AsyncSession):
     """
-    title로 BlogPost를 검색하고, 저장된 데이터를 반환합니다.
+    title로 SNSPost를 검색하고, 저장된 데이터를 반환합니다.
     """
     try:
-        # 1. BlogPost에서 title로 검색
-        blog_post_query = await db.execute(select(BlogPost).where(BlogPost.post_id == post_id))
-        blog_post = blog_post_query.scalars().all()
+        # 1. SNSPost에서 title로 검색
+        sns_post_query = await db.execute(select(SNSPost).where(SNSPost.post_id == post_id))
+        sns_post = sns_post_query.scalars().all()
 
-        # 2. BlogPost가 존재하지 않을 경우 에러 반환
-        if not blog_post:
-            raise HTTPException(status_code=404, detail=f"Blog with title '{post_id}' not found.")
+        # 2. SNSPost가 존재하지 않을 경우 에러 반환
+        if not sns_post:
+            raise HTTPException(status_code=404, detail=f"sns with title '{post_id}' not found.")
         
-        blog_post = blog_post[0]
-        blog_post.views += 1
+        sns_post = sns_post[0]
+        sns_post.views += 1
         await db.commit()
         
         # 댓글 갯수 계산
         comments_count_result = await db.execute(
-        select(func.count(BlogComment.comment_id)).where(BlogComment.post_id == post_id)
+        select(func.count(SNSComment.comment_id)).where(SNSComment.post_id == post_id)
     )
         comments_count = comments_count_result.scalar()
         
-        # 3. 해당 post_id로 ContentBlock 검색
+        # 3. 해당 post_id로 ContentBlockForSNS 검색
         content_blocks_query = await db.execute(
-            select(ContentBlock).where(ContentBlock.post_id == blog_post.post_id).order_by(ContentBlock.block_order)
+            select(ContentBlockForSNS).where(ContentBlockForSNS.post_id == sns_post.post_id).order_by(ContentBlockForSNS.block_order)
         )
         content_blocks = content_blocks_query.scalars().all()
 
         # 4. 데이터 변환 (JSON 형태로 반환할 수 있도록 구조화)
         response_data = {
-            "post_id": blog_post.post_id,
-            "title": blog_post.title,
-            "created_at": blog_post.created_at,
-            "views": blog_post.views,
-            "likes": blog_post.likes,
-            "is_ad": blog_post.is_ad,
-            "comments_count": blog_post.comments_count,
+            "post_id": sns_post.post_id,
+            "title": sns_post.title,
+            "created_at": sns_post.created_at,
+            "views": sns_post.views,
+            "likes": sns_post.likes,
+            "is_ad": sns_post.is_ad,
+            "comments_count": sns_post.comments_count,
             "blocks": [
                 {
                     "block_type": block.block_type,
@@ -172,54 +172,54 @@ async def get_blog_data_from_DB(post_id: str, db: AsyncSession):
         raise http_ex
     except Exception as e:
         # 기타 예상치 못한 에러 처리
-        print(f"Error in get_blog_data: {e}")
+        print(f"Error in get_sns_data: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 
-async def add_like_on_blog_page(post_id: int, db: AsyncSession):
+async def add_like_on_sns_page(post_id: int, db: AsyncSession):
     """
-    특정 블로그 글에 추천 추가
+    특정 SNS 글에 추천 추가
     """
-    # 블로그 글 가져오기
-    blog_query = await db.execute(select(BlogPost).where(BlogPost.post_id == post_id))
-    blog = blog_query.scalar_one_or_none()
+    # SNS 글 가져오기
+    sns_query = await db.execute(select(SNSPost).where(SNSPost.post_id == post_id))
+    sns = sns_query.scalar_one_or_none()
 
-    if not blog:
-        raise HTTPException(status_code=404, detail="Blog not found")
+    if not sns:
+        raise HTTPException(status_code=404, detail="sns not found")
 
     # 추천수 증가
-    blog.likes += 1
+    sns.likes += 1
     await db.commit()
 
     return {
-        "post_id": blog.post_id,
-        "title": blog.title,
-        "likes": blog.likes
+        "post_id": sns.post_id,
+        "title": sns.title,
+        "likes": sns.likes
     }
 
-async def delete_blog_from_DB(post_id: str, db: AsyncSession):
+async def delete_sns_from_DB(post_id: str, db: AsyncSession):
     """
-    블로그와 관련된 모든 데이터를 삭제
+    SNS와 관련된 모든 데이터를 삭제
     """
-    # 1. 블로그 존재 확인
-    blog_query = await db.execute(select(BlogPost).where(BlogPost.post_id == post_id))
-    blog = blog_query.scalar_one_or_none()
+    # 1. SNS 글 존재 확인
+    sns_query = await db.execute(select(SNSPost).where(SNSPost.post_id == post_id))
+    sns = sns_query.scalar_one_or_none()
 
-    if not blog:
-        raise HTTPException(status_code=404, detail="Blog not found")
+    if not sns:
+        raise HTTPException(status_code=404, detail="sns not found")
 
-    # 2. 블로그 삭제
-    await db.delete(blog)
+    # 2. SNS 삭제
+    await db.delete(sns)
     await db.commit()
 
-    return {"message": f"Blog with post_id {post_id} and its comments deleted successfully"}
+    return {"message": f"sns with post_id {post_id} and its comments deleted successfully"}
 
 async def create_comment_content(comment: CommentCreate, db: AsyncSession):
     """
-    댓글 생성 및 블로그 글의 댓글 수 증가
+    댓글 생성 및 SNS 글의 댓글 수 증가
     """
     # 댓글 생성
-    new_comment = BlogComment(
+    new_comment = SNSComment(
         post_id=comment.post_id,
         comment_name=comment.comment_name,
         comment_password=comment.comment_password,
@@ -228,11 +228,11 @@ async def create_comment_content(comment: CommentCreate, db: AsyncSession):
     db.add(new_comment)
 
     # 댓글 수 증가
-    blog_query = await db.execute(select(BlogPost).where(BlogPost.post_id == comment.post_id))
-    blog = blog_query.scalar_one_or_none()
-    if not blog:
-        raise HTTPException(status_code=404, detail="Blog post not found")
-    blog.comments_count += 1
+    sns_query = await db.execute(select(SNSPost).where(SNSPost.post_id == comment.post_id))
+    sns = sns_query.scalar_one_or_none()
+    if not sns:
+        raise HTTPException(status_code=404, detail="sns post not found")
+    sns.comments_count += 1
 
     await db.commit()
     await db.refresh(new_comment)
@@ -240,7 +240,7 @@ async def create_comment_content(comment: CommentCreate, db: AsyncSession):
     # Pydantic 모델로 직렬화된 데이터 반환
     return {
         "message": "Comment added successfully", 
-        "comments_count": blog.comments_count,
+        "comments_count": sns.comments_count,
         "comment_id": new_comment.comment_id,
         "post_id": new_comment.post_id,
         "comment_name": new_comment.comment_name,
@@ -252,7 +252,7 @@ async def get_comments_contents(post_id: int, db: AsyncSession):
     """
     특정 글의 댓글 조회
     """
-    comments_query = await db.execute(select(BlogComment).where(BlogComment.post_id == post_id))
+    comments_query = await db.execute(select(SNSComment).where(SNSComment.post_id == post_id))
     comments = comments_query.scalars().all()
 
     return comments
@@ -260,11 +260,11 @@ async def get_comments_contents(post_id: int, db: AsyncSession):
 async def get_comments_count_from_DB(post_id: int, db: AsyncSession):
     
     """
-    특정 블로그 글의 댓글 갯수 조회
+    특정 글의 댓글 갯수 조회
     """
     # 댓글 갯수 계산
     result = await db.execute(
-        select(func.count(BlogComment.comment_id)).where(BlogComment.post_id == post_id)
+        select(func.count(SNSComment.comment_id)).where(SNSComment.post_id == post_id)
     )
     comments_count = result.scalar()
 
@@ -275,7 +275,7 @@ async def delete_comment_data(post_id: str, comment_password: str, db: AsyncSess
     댓글 삭제
     """
     # 댓글 존재 확인
-    comment_query = await db.execute(select(BlogComment).where(BlogComment.post_id == post_id))
+    comment_query = await db.execute(select(SNSComment).where(SNSComment.post_id == post_id))
     comment = comment_query.scalar_one_or_none()
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")

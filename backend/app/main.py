@@ -1,4 +1,4 @@
-from app.router import blog, core, core_check, process_check, healthcheck, test
+from app.router import blog, core, core_check, process_check, healthcheck, test, sns
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -15,11 +15,12 @@ app.add_middleware(
     allow_headers=["*"],  # 모든 HTTP 헤더 허용
 )
 # 라우터 등록
-app.include_router(blog.router)
-app.include_router(core.router)
-app.include_router(core_check.router)
 app.include_router(healthcheck.router)
 app.include_router(process_check.router)
+app.include_router(blog.router)
+app.include_router(sns.router)
+app.include_router(core.router)
+app.include_router(core_check.router)
 app.include_router(test.router)
 
 # 실행
