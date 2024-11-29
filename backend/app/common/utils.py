@@ -1,5 +1,7 @@
 import mimetypes
 from fastapi import UploadFile, HTTPException
+from passlib.context import CryptContext
+
 
 # 유효한 MIME 타입 및 확장자 정의
 VALID_MIME_TYPES = {"application/json", "image/png", "image/jpeg"}
@@ -14,3 +16,7 @@ def is_valid_file_type(file: UploadFile):
     if not file.filename.lower().endswith(tuple(VALID_EXTENSIONS)):
         return False
     return True
+
+def make_pwd_to_hash():
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    return pwd_context

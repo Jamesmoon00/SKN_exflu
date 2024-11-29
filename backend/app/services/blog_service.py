@@ -1,4 +1,4 @@
-from app.schemas.blog import TitleCreate, CommentResponse,CommentCreate
+from app.schemas.blog import CommentDelete, TitleCreate, CommentResponse,CommentCreate
 from app.database.models import BlogPost, ContentBlock, BlogComment
 from typing import Optional
 from app.common.consts import BUCKET_NAME, REGION_NAME
@@ -8,10 +8,7 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from app.common.utils import is_valid_file_type
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from app.common.utils import is_valid_file_type, make_pwd_to_hash
 
 ###########################검증 코드셋##############################
 # # 비밀번호 해싱
@@ -240,7 +237,7 @@ async def create_comment_content(comment: CommentCreate, db: AsyncSession):
     댓글 생성 및 블로그 글의 댓글 수 증가
     """
     # 비밀번호 암호화
-    hashed_password = pwd_context.hash(comment.comment_password)
+    hashed_password = make_pwd_to_hash().hash(comment.comment_password)
 
     # 댓글 생성
     new_comment = BlogComment(
@@ -294,31 +291,33 @@ async def get_comments_count_from_DB(post_id: int, db: AsyncSession):
 
     return {"post_id": post_id, "comments_count": comments_count}
 
-async def delete_comment_data(post_id: int, comment_name: str, comment_password: str, db: AsyncSession):
+async def delete_comment_data(comment: CommentDelete, db: AsyncSession):
     """
     댓글 삭제
     """
     # 댓글 존재 확인 (post_id와 comment_name 모두 확인)
-    comment_query = await db.execute(
+    blog_comment_query = await db.execute(
         select(BlogComment).where(
-            BlogComment.post_id == post_id,
-            BlogComment.comment_name == comment_name
+            BlogComment.post_id == comment.post_id,
+            BlogComment.comment_name == comment.comment_name
         )
     )
-    comment = comment_query.scalar_one_or_none()
 
-    if not comment:
+    if not blog_comment_query:
         raise HTTPException(status_code=404, detail="Comment not found")
+    # 지정하는 방법도 생각해야 할 것
+    blog_comment_query = blog_comment_query.scalars().all()
+    blog_comment_query = blog_comment_query[0]
 
     # 비밀번호 검증
-    if not pwd_context.verify(comment_password, comment.comment_password):
+    if not make_pwd_to_hash().verify(comment.comment_password, blog_comment_query.comment_password):
         raise HTTPException(status_code=403, detail="Invalid password")
 
     # 댓글 삭제
-    await db.delete(comment)
+    await db.delete(blog_comment_query)
 
     # 댓글 수 감소
-    blog_query = await db.execute(select(BlogPost).where(BlogPost.post_id == post_id))
+    blog_query = await db.execute(select(BlogPost).where(BlogPost.post_id == comment.post_id))
     blog = blog_query.scalar_one_or_none()
     if blog:
         blog.comments_count -= 1

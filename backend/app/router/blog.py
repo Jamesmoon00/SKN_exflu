@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.blog import TitleCreate, BlogContent, CommentCreate, CommentResponse, BlogCommentCountReapone
+from app.schemas.blog import CommentDelete, TitleCreate, BlogContent, CommentCreate, CommentResponse, BlogCommentCountReapone
 from app.services.blog_service import send_title_data_to_DB, process_blog_data, get_blog_data_from_DB, create_comment_content, get_comments_contents, delete_comment_data, delete_blog_from_DB, add_like_on_blog_page, get_comments_count_from_DB
 from app.database.database import get_db
 import json
@@ -95,9 +95,9 @@ async def get_comments(post_id: int, db: AsyncSession = Depends(get_db)):
 
 # 댓글 삭제
 @router.delete("/comments/{post_id}", summary="블로그 댓글 삭제", response_model=dict)
-async def delete_comment(post_id:str, comment_name:str, comment_password: str, db: AsyncSession = Depends(get_db)):
+async def delete_comment(comment: CommentDelete, db: AsyncSession = Depends(get_db)):
     try:
-        result = await delete_comment_data(post_id,comment_name,comment_password, db)  # 서비스 로직 호출
+        result = await delete_comment_data(comment, db)  # 서비스 로직 호출
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

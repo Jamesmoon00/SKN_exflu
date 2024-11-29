@@ -17,6 +17,11 @@ class CommentCreate(BaseModel): # 댓글 저장
     comment_name: str
     comment_password: str
     comment_content: str
+    
+class CommentDelete(BaseModel):
+    post_id: int
+    comment_name: str
+    comment_password: str
 
 class CommentResponse(BaseModel): # 댓글 응답
     comment_id: int
