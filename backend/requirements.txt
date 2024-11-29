@@ -18,6 +18,7 @@ boto3              # AWS SDK for Python
 # 데이터 검증 및 유틸리티
 pydantic           # 데이터 검증 및 설정 관리
 python-dotenv      # 환경 변수 관리
+passlib[bcrypt]
 
 # 로그 관리 및 테스트
 loguru             # 고급 로깅 라이브러리

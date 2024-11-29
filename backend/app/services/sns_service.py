@@ -9,6 +9,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from app.common.utils import is_valid_file_type
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # from app.common.config import get_s3_client
 # # AWS S3 클라이언트
 # s3_client = get_s3_client()
@@ -213,41 +216,42 @@ async def delete_sns_from_DB(post_id: str, db: AsyncSession):
     await db.commit()
 
     return {"message": f"sns with post_id {post_id} and its comments deleted successfully"}
-
 async def create_comment_content(comment: CommentCreate, db: AsyncSession):
     """
-    댓글 생성 및 SNS 글의 댓글 수 증가
+    댓글 생성 및 블로그 글의 댓글 수 증가
     """
+    # 비밀번호 암호화
+    hashed_password = pwd_context.hash(comment.comment_password)
+
     # 댓글 생성
     new_comment = SNSComment(
         post_id=comment.post_id,
         comment_name=comment.comment_name,
-        comment_password=comment.comment_password,
+        comment_password=hashed_password,  # 암호화된 비밀번호 저장
         comment_content=comment.comment_content,
     )
     db.add(new_comment)
 
     # 댓글 수 증가
-    sns_query = await db.execute(select(SNSPost).where(SNSPost.post_id == comment.post_id))
-    sns = sns_query.scalar_one_or_none()
-    if not sns:
-        raise HTTPException(status_code=404, detail="sns post not found")
-    sns.comments_count += 1
+    blog_query = await db.execute(select(SNSPost).where(SNSPost.post_id == comment.post_id))
+    blog = blog_query.scalar_one_or_none()
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog post not found")
+    blog.comments_count += 1
 
     await db.commit()
     await db.refresh(new_comment)
 
     # Pydantic 모델로 직렬화된 데이터 반환
     return {
-        "message": "Comment added successfully", 
-        "comments_count": sns.comments_count,
+        "message": "Comment added successfully",
+        "comments_count": blog.comments_count,
         "comment_id": new_comment.comment_id,
         "post_id": new_comment.post_id,
         "comment_name": new_comment.comment_name,
         "comment_content": new_comment.comment_content,
     }
-
-
+    
 async def get_comments_contents(post_id: int, db: AsyncSession):
     """
     특정 글의 댓글 조회
@@ -270,22 +274,35 @@ async def get_comments_count_from_DB(post_id: int, db: AsyncSession):
 
     return {"post_id": post_id, "comments_count": comments_count}
 
-async def delete_comment_data(post_id: str, comment_password: str, db: AsyncSession):
+async def delete_comment_data(post_id: int, comment_name: str, comment_password: str, db: AsyncSession):
     """
     댓글 삭제
     """
-    # 댓글 존재 확인
-    comment_query = await db.execute(select(SNSComment).where(SNSComment.post_id == post_id))
+    # 댓글 존재 확인 (post_id와 comment_name 모두 확인)
+    comment_query = await db.execute(
+        select(SNSComment).where(
+            SNSComment.post_id == post_id,
+            SNSComment.comment_name == comment_name
+        )
+    )
     comment = comment_query.scalar_one_or_none()
+
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
 
-    # 비밀번호 확인
-    if comment.comment_password != comment_password:
+    # 비밀번호 검증
+    if not pwd_context.verify(comment_password, comment.comment_password):
         raise HTTPException(status_code=403, detail="Invalid password")
 
     # 댓글 삭제
     await db.delete(comment)
+
+    # 댓글 수 감소
+    blog_query = await db.execute(select(SNSPost).where(SNSPost.post_id == post_id))
+    blog = blog_query.scalar_one_or_none()
+    if blog:
+        blog.comments_count -= 1
+
     await db.commit()
 
     return {"message": "Comment deleted successfully"}
