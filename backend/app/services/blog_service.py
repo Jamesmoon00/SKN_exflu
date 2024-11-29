@@ -9,6 +9,27 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from app.common.utils import is_valid_file_type
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+###########################검증 코드셋##############################
+# # 비밀번호 해싱
+# plain_password = "securepassword123"
+# hashed_password = pwd_context.hash(plain_password)
+
+# # 해시된 비밀번호 출력
+# print("Hashed Password:", hashed_password)
+
+# # 비밀번호 검증
+# is_valid = pwd_context.verify("securepassword123", hashed_password)
+# print("Is Valid:", is_valid)  # 출력: True
+
+# # 잘못된 비밀번호 검증
+# is_invalid = pwd_context.verify("wrongpassword", hashed_password)
+# print("Is Invalid:", is_invalid)  # 출력: False
+########################################################################
+
 # from app.common.config import get_s3_client
 # # AWS S3 클라이언트
 # s3_client = get_s3_client()
@@ -136,7 +157,7 @@ async def get_blog_data_from_DB(post_id: str, db: AsyncSession):
         # 댓글 갯수 계산
         comments_count_result = await db.execute(
         select(func.count(BlogComment.comment_id)).where(BlogComment.post_id == post_id)
-    )
+        )
         comments_count = comments_count_result.scalar()
         
         # 3. 해당 post_id로 ContentBlock 검색
@@ -153,7 +174,7 @@ async def get_blog_data_from_DB(post_id: str, db: AsyncSession):
             "views": blog_post.views,
             "likes": blog_post.likes,
             "is_ad": blog_post.is_ad,
-            "comments_count": blog_post.comments_count,
+            "comments_count": comments_count,
             "blocks": [
                 {
                     "block_type": block.block_type,
@@ -218,11 +239,14 @@ async def create_comment_content(comment: CommentCreate, db: AsyncSession):
     """
     댓글 생성 및 블로그 글의 댓글 수 증가
     """
+    # 비밀번호 암호화
+    hashed_password = pwd_context.hash(comment.comment_password)
+
     # 댓글 생성
     new_comment = BlogComment(
         post_id=comment.post_id,
         comment_name=comment.comment_name,
-        comment_password=comment.comment_password,
+        comment_password=hashed_password,  # 암호화된 비밀번호 저장
         comment_content=comment.comment_content,
     )
     db.add(new_comment)
@@ -239,7 +263,7 @@ async def create_comment_content(comment: CommentCreate, db: AsyncSession):
 
     # Pydantic 모델로 직렬화된 데이터 반환
     return {
-        "message": "Comment added successfully", 
+        "message": "Comment added successfully",
         "comments_count": blog.comments_count,
         "comment_id": new_comment.comment_id,
         "post_id": new_comment.post_id,
@@ -270,22 +294,35 @@ async def get_comments_count_from_DB(post_id: int, db: AsyncSession):
 
     return {"post_id": post_id, "comments_count": comments_count}
 
-async def delete_comment_data(post_id: str, comment_password: str, db: AsyncSession):
+async def delete_comment_data(post_id: int, comment_name: str, comment_password: str, db: AsyncSession):
     """
     댓글 삭제
     """
-    # 댓글 존재 확인
-    comment_query = await db.execute(select(BlogComment).where(BlogComment.post_id == post_id))
+    # 댓글 존재 확인 (post_id와 comment_name 모두 확인)
+    comment_query = await db.execute(
+        select(BlogComment).where(
+            BlogComment.post_id == post_id,
+            BlogComment.comment_name == comment_name
+        )
+    )
     comment = comment_query.scalar_one_or_none()
+
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
 
-    # 비밀번호 확인
-    if comment.comment_password != comment_password:
+    # 비밀번호 검증
+    if not pwd_context.verify(comment_password, comment.comment_password):
         raise HTTPException(status_code=403, detail="Invalid password")
 
     # 댓글 삭제
     await db.delete(comment)
+
+    # 댓글 수 감소
+    blog_query = await db.execute(select(BlogPost).where(BlogPost.post_id == post_id))
+    blog = blog_query.scalar_one_or_none()
+    if blog:
+        blog.comments_count -= 1
+
     await db.commit()
 
     return {"message": "Comment deleted successfully"}

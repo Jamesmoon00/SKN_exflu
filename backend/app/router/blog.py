@@ -95,9 +95,9 @@ async def get_comments(post_id: int, db: AsyncSession = Depends(get_db)):
 
 # 댓글 삭제
 @router.delete("/comments/{post_id}", summary="블로그 댓글 삭제", response_model=dict)
-async def delete_comment(post_id:str, password: str, db: AsyncSession = Depends(get_db)):
+async def delete_comment(post_id:str, comment_name:str, comment_password: str, db: AsyncSession = Depends(get_db)):
     try:
-        result = await delete_comment_data(post_id,password, db)  # 서비스 로직 호출
+        result = await delete_comment_data(post_id,comment_name,comment_password, db)  # 서비스 로직 호출
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
