@@ -7,6 +7,8 @@ import SideCard from "../components/board/SideCard";
 const Blog = () => {
     const [posts, setPosts] = useState([]); // 게시글 데이터를 저장할 상태
     const [showSideCard, setShowSideCard] = useState(true); // SideCard 표시 여부 상태
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
     useEffect(() => {
         // 서버에서 데이터 가져오기
         const fetchPosts = async () => {
@@ -25,6 +27,7 @@ const Blog = () => {
     useEffect(() => {
         const handleResize = () => {
             setShowSideCard(window.innerWidth > 1000); // 768px 이하일 때 SideCard 숨김
+            setIsMobile(window.innerWidth <= 768);
         };
 
         handleResize(); // 초기 크기 설정
@@ -38,13 +41,17 @@ const Blog = () => {
             style={{
                 ...styles.container,
                 marginLeft: showSideCard ? "45px" : "0", // SideNav가 없으면 marginLeft를 0으로 설정
+                marginRight: isMobile ? "25px" : "45px"
             }}
         >
             {/* 왼쪽 사이드바 */}
             {/* SideCard는 showSideCard가 true일 때만 렌더링 */}
             {showSideCard && <SideCard />}
             {/* 오른쪽 게시글 리스트 */}
-            <div style={styles.blogList}>
+            <div style={{...styles.blogList,
+                marginLeft : isMobile ? "20px" : "40px",
+                marginRignt : isMobile ? "-25px" : "0px"
+            }}>
                 <div style={styles.blogHeader}>
                     <p style={styles.postCount}>✏️목록</p>
                     <div style={styles.postHeader}>

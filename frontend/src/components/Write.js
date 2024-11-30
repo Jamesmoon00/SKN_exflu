@@ -14,7 +14,7 @@ const Write = () => {
     const [password, setPassword] = useState("");
     const [content, setContent] = useState("");
     const [showSideCard, setShowSideCard] = useState(true); // SideCard 표시 여부 상태
-
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // 모바일 여부 상태
     const handleAddComment = () => {
         if (!writer || !content) {
             alert("작성자와 내용을 입력해주세요!");
@@ -48,12 +48,13 @@ const Write = () => {
 
     useEffect(() => {
         const handleResize = () => {
-            setShowSideCard(window.innerWidth > 1000); // 768px 이하일 때 SideCard 숨김
+            setShowSideCard(window.innerWidth > 1000);
+            setIsMobile(window.innerWidth <= 768); // 화면 크기 변경에 따라 모바일 여부 업데이트
         };
 
-        handleResize(); // 초기 크기 설정
-        window.addEventListener("resize", handleResize); // 리사이즈 이벤트 추가
-        return () => window.removeEventListener("resize", handleResize); // 이벤트 제거
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, []);
 
     return (
@@ -70,24 +71,39 @@ const Write = () => {
             <div
                 style={{
                     ...styles.post,
-                    flex: showSideCard ? "2.5" : "3.5", // SideCard가 없을 때 너비 확장
+                    flex: showSideCard ? "2.5" : "3.5",
+                    fontSize: isMobile ? "0.5rem" : "1rem", // 모바일 환경에서는 폰트 크기 축소
+                    padding: isMobile ? "15px 15px" : "30px 30px",
+                    marginLeft : isMobile ? "25px" : "40px",
+                    marginRight : isMobile ? "-20px" : "0px",
+                    marginTop : isMobile ? "20px" : "30px",
                 }}
             >
-                <div style={styles.postHeader}>
-                    <img src={profileImage} alt="" style={styles.profileImage} />
-                    <div style={styles.authorInfo}>
-                        <p style={styles.authorName}>Eddy</p>
-                        <p style={styles.postDate}>2024-11-15</p>
+                <div style={{ ...styles.postHeader, fontSize: isMobile ? "0.9rem" : "1rem" }}>
+                    <img
+                        src={profileImage}
+                        alt=""
+                        style={{
+                            ...styles.profileImage,
+                            width: isMobile ? "40px" : "60px",
+                            height: isMobile ? "40px" : "60px",
+                            marginBottom: isMobile ? "0px" : "20px",
+                        }}
+                    />
+                    <div style={{...styles.authorInfo}}>
+                        <p style={{...styles.authorName, fontSize: isMobile ? "0.8rem" : "1rem"}}>Eddy</p>
+                        <p style={{...styles.postDate, fontSize: isMobile ? "0.6rem" : "0.8rem"}}>2024-11-15</p>
                     </div>
                 </div>
     
-                <div style={styles.Imagecontainer}>
-                    <img src={bombImage} alt="Character Scene" style={styles.image} />
+                <div style={{...styles.Imagecontainer, marginTop : isMobile ? "0px" : "20px"}}>
+                    <img src={bombImage} alt="Character Scene" style={{...styles.image, width: isMobile ? "80%" : "60%"}} />
                 </div>
     
-                <div style={styles.contentbox}>
-                    <p style={styles.content}>
+                <div style={{...styles.contentbox, marginTop: isMobile ? "5px" : "20px"}}>
+                    <p style={{...styles.content , fontSize : isMobile ? "0.9rem" : "1.1rem"}}>
                         오늘 뽀로로🐧한테 골탕먹이려다가 폭탄맞음;;;; 뽀로로뽀로로뽀로로뽀로로
+                        
                     </p>
                     <button style={styles.button}>
                         <div style={styles.buttonContent}>
@@ -97,17 +113,30 @@ const Write = () => {
                     </button>
                 </div>
     
-                <div style={styles.commentHeader}>
-                    <img src={comment} alt="comment icon" style={styles.commentword} />
-                    <p style={styles.commentHeaderText}>comment</p>
+                <div style={{...styles.commentHeader, gap: isMobile ? "0px" : "5px"}}>
+                    <img src={comment} alt="comment icon" style=
+                   {{...styles.commentword, 
+                    width: isMobile ? "15px" : "25px",
+                    height: isMobile ? "15px" : "25px",
+                   
+                   }} />
+                    <p style={{...styles.commentHeaderText, 
+                        fontSize : isMobile ? "1.2rem" : "1.5rem",
+                        marginBottom : isMobile ? "25px" : "35px"}}>comment</p>
                 </div>
                 <div style={styles.contentLine}></div>
     
                 <Comment comments={comments} onEdit={handleEditComment} />
     
-                <div style={styles.writerHeader}>
-                    <img src={commentwrite} alt="comment icon" style={styles.writerword} />
-                    <p style={styles.writerHeaderText}>write</p>
+                <div style={{...styles.writerHeader, gap : isMobile ? "0px" : "5px"}}>
+                    <img src={commentwrite} alt="comment icon" style={{...styles.writerword,
+                        width : isMobile ? "20px" : "25px",
+                        height : isMobile ? "20px" : "25px"
+                    }} />
+                    <p style={{...styles.writerHeaderText,
+                        fontSize : isMobile ? "1.2rem" : "1.5rem",
+                        marginLeft : isMobile ? "5px" : "10px",
+                    }}>write</p>
                 </div>
                 <CommentForm
                     writer={writer}
@@ -136,16 +165,13 @@ const styles = {
         width: "25%",
     },
     post: {
-        marginTop: "30px",
-        marginLeft: "40px",
         backgroundColor: "#fffdf7",
         borderRadius: "10px",
-        padding: "30px 30px 30px",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        marginBottom: "30px",
         overflow: "auto",
     },
     profileImage: {
+        display: "flex",
         width: "60px",
         height: "60px",
         borderRadius: "10%",
@@ -158,7 +184,7 @@ const styles = {
         marginLeft: "10px",
     },
     authorName: {
-        fontSize: "1rem",
+       
         fontWeight: "bold",
         marginBottom: "0px",
     },
@@ -176,6 +202,7 @@ const styles = {
         marginTop: "20px",
     },
     image: {
+        display: "flex",
         boxShadow: `
         0px 2px 15px rgba(212, 165, 98, 0.2), 
         0px 4px 30px rgba(212, 165, 98, 0.1)
@@ -196,17 +223,14 @@ const styles = {
         width: "95%",
     },
     button: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "px 10px",
-        borderRadius: "10px",
-        backgroundColor: "#FFF2F1",
-        cursor: "pointer",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        border: "none",
-        marginTop: "10px",
-        marginBottom: "20px"
+        boxSizing: "border-box", // 수정: "box-sizing"의 오타 수정
+        width: "80px",
+        height: "40px",
+        background: "#FFE8E7",
+        border: "1px solid #FFF2F1",
+        boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        borderRadius: "15px",
+        cursor: "pointer", // 추가: 버튼 클릭 가능 커서
     },
     buttonContent: {
         display: "flex",
@@ -214,11 +238,11 @@ const styles = {
         gap: "5px",
     },
     icon: {
-        width: "30px",
-        height: "30px",
+        width: "25px",
+        height: "25px",
     },
     text: {
-        fontSize: "1.2rem",
+        fontSize: "1rem",
         color: "#000",
         margin: 0,
     },
@@ -248,7 +272,7 @@ const styles = {
     writerHeader: {
         display: "flex",
         alignItems: "center",
-        marginBottom: "-15px",
+        marginBottom: "-30px",
         marginTop: "-5px",
        
         gap: "5px",

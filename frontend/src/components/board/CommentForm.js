@@ -26,21 +26,21 @@ const CommentForm = ({ writer, password, content, onWriterChange, onPasswordChan
             borderRadius: "10px",
             border: "1px solid #FFFAEA",
         },
+
         submitButton: {
-            marginTop: "20px",
-            border: "1px solid #FFF2F1",
+            marginTop: "30px",
+            boxSizing: "border-box", // 수정: "box-sizing"의 오타 수정
+            width: "80px",
+            height: "40px",
+            background: "#FBE5A2",
+            border: "1px solid #F5E4AE",
+            boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
             borderRadius: "15px",
-            backgroundColor: "#FBE5A2",
-            justifyContent: "center",
-            alignItems: "flex-end",
-            width: "100px",
-            height: "45px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            cursor: "pointer", // 추가: 버튼 클릭 가능 커서
+    
+            
         },
-        buttontext: {
-            textAlign: "center",
-            color: "white",
-        },
+
     };
 
     return (
@@ -66,9 +66,12 @@ const CommentForm = ({ writer, password, content, onWriterChange, onPasswordChan
                 onChange={onContentChange}
                 style={styles.textarea}
             />
-            <button onClick={onSubmit} style={styles.submitButton}>
-                <p style={styles.buttontext}>등록</p>
+
+            <button onClick={onSubmit} type="submit" style={styles.submitButton}>
+                등록
             </button>
+     
+            
         </div>
     );
 };

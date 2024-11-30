@@ -27,10 +27,11 @@ const YesPage = () => {
         },
     ];
     const [showSideCard, setShowSideCard] = useState(true);
-
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     useEffect(() => {
         const handleResize = () => {
             setShowSideCard(window.innerWidth > 1000); // 768px 이하일 때 SideCard 숨김
+            setIsMobile(window.innerWidth <= 768); 
         };
 
         handleResize(); // 초기 크기 설정
@@ -53,6 +54,11 @@ const YesPage = () => {
                 style={{
                     ...styles.post,
                     flex: showSideCard ? "2.5" : "3.5", // SideCard가 없을 때 너비 확장
+                    marginLeft : isMobile ? "25px" : "40px",
+                    marginRight : isMobile ? "-20px" : "0px",
+                    marginTop : isMobile ? "20px" : "30px",
+                    padding : isMobile ? "20px 10px 10px" : "30px 30px 30px",
+                    marginBottom : isMobile ? "15px" : "30px"
                 }}
             >
                 <Snowfall
@@ -61,7 +67,9 @@ const YesPage = () => {
                     style={{ zIndex: 9999 }} // 눈이 모든 요소 위에 표시되도록 설정
                 />
                 <div style={styles.postHeader}>
-                    <img src={question} alt="" style={styles.questionImage} />
+                    <img src={question} alt="" style={{...styles.questionImage,
+                        width : isMobile ? "70%" : "40%"
+                    }} />
                 </div>
                 <div style={styles.contentLine}></div>
                 <form style={styles.form}>

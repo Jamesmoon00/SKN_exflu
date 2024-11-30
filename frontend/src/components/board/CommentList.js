@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 
 
 
@@ -25,23 +25,33 @@ const CommentList = ({ comments, onEdit }) => {
             color: "#333", // 댓글 내용 색상
         },
         editButton: {
-            backgroundColor: "#FBE5A2", // 버튼 배경색
-            border: "none", // 테두리 제거
-            borderRadius: "10px", // 버튼 둥글기
-            padding: "10px 13px", // 버튼 내부 여백
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            color: "#000", // 텍스트 색상
-            transition: "background-color 0.3s ease", // 배경색 전환 효과
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            textAlign: "center",
+            boxSizing: "border-box", // 수정: "box-sizing"의 오타 수정
+            width: "80px",
+            height: "40px",
+            background: "#FBE5A2",
+            border: "1px solid #F5E4AE",
+            boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+            borderRadius: "15px",
+            cursor: "pointer", // 추가: 버튼 클릭 가능 커서
         },
     };
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); 
+    useEffect(() => {
+        const handleResize = () => {
+            
+            setIsMobile(window.innerWidth <= 768); // 화면 크기 변경에 따라 모바일 여부 업데이트
+        };
 
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
     return (
         <div>
             {comments.map((comment) => (
-                <div key={comment.id} style={styles.commentItem}>
+                <div key={comment.id} style={{...styles.commentItem,
+                    padding : isMobile ? "14px 10px" : "17px 30px"
+                }}>
                     <div style={styles.commentText}>
                         <strong>{comment.writer}</strong>
                         <p style={styles.commentContent}>{comment.content}</p>

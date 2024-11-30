@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const TopNav = () => {
-    const [hoveredLink, setHoveredLink] = useState(null); // 현재 호버된 링크
-    const [hoveredLogo, setHoveredLogo] = useState(false); // 로고 호버 상태
-    const [hoveredIcon, setHoveredIcon] = useState(false); // 아이콘 호버 상태
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth); // 화면 너비 상태
+    const [hoveredLink, setHoveredLink] = useState(null);
+    const [hoveredLogo, setHoveredLogo] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // 화면 크기 변경 감지
     useEffect(() => {
@@ -26,29 +26,12 @@ const TopNav = () => {
         return "80px"; // PC 환경에서 간격 유지
     };
 
-    const handleMouseEnter = (link) => {
-        setHoveredLink(link); // 호버된 링크 설정
-    };
+    const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
-    const handleMouseLeave = () => {
-        setHoveredLink(null); // 호버 해제
-    };
-
-    const handleLogoMouseEnter = () => {
-        setHoveredLogo(true); // 로고 호버
-    };
-
-    const handleLogoMouseLeave = () => {
-        setHoveredLogo(false); // 로고 호버 해제
-    };
-
-    const handleIconMouseEnter = () => {
-        setHoveredIcon(true); // 아이콘 호버
-    };
-
-    const handleIconMouseLeave = () => {
-        setHoveredIcon(false); // 아이콘 호버 해제
-    };
+    const handleMouseEnter = (link) => setHoveredLink(link);
+    const handleMouseLeave = () => setHoveredLink(null);
+    const handleLogoMouseEnter = () => setHoveredLogo(true);
+    const handleLogoMouseLeave = () => setHoveredLogo(false);
 
     return (
         <div style={styles.container}>
@@ -59,7 +42,7 @@ const TopNav = () => {
                         to="/"
                         style={{
                             ...styles.logo,
-                            fontSize: `${getFontSize(2)}rem`, // 동적으로 글자 크기 설정
+                            fontSize: `${getFontSize(2)}rem`,
                             ...(hoveredLogo ? styles.logoHover : {}),
                         }}
                         onMouseEnter={handleLogoMouseEnter}
@@ -68,49 +51,65 @@ const TopNav = () => {
                         eXflu;
                     </Link>
 
-                    {/* 네비게이션 링크 */}
-                    <div style={{ ...styles.navLinks, gap: getGap() }}>
-                        {["profile", "blog", "contact"].map((text) => (
-                            <Link
-                                key={text}
-                                to={`/${text}`}
-                                style={{
-                                    ...styles.link,
-                                    fontSize: `${getFontSize(1.2)}rem`,
-                                    ...(hoveredLink === text ? styles.linkHover : {}),
-                                }}
-                                onMouseEnter={() => handleMouseEnter(text)}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                {text}
-                            </Link>
-                        ))}
-                    </div>
+                    {/* 햄버거 메뉴 버튼 */}
+                    {windowWidth < 768 && (
+                        <button onClick={toggleMenu} style={styles.hamburger}>
+                            ☰
+                        </button>
+                    )}
 
-                    {/* 아이콘 */}
-                    <a
-                        href="https://www.instagram.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            ...styles.icon,
-                            ...(hoveredIcon ? styles.iconHover : {}),
-                        }}
-                        onMouseEnter={handleIconMouseEnter}
-                        onMouseLeave={handleIconMouseLeave}
-                    >
-                        <img
-                            src="https://img.icons8.com/ios-glyphs/30/000000/instagram-new.png"
-                            alt="Instagram"
+                    {/* 네비게이션 링크 */}
+                    {(windowWidth >= 768 || isMenuOpen) && (
+                        <div
                             style={{
-                                ...styles.iconsize,
-                                width: `${getFontSize(2.5)}rem`,
-                                height: `${getFontSize(2.5)}rem`,
+                                ...styles.navLinks,
+                                flexDirection: windowWidth < 768 ? "column" : "row", // 모바일에서 세로 정렬
+                                gap: getGap(),
+                                position: windowWidth < 768 ? "absolute" : "static",
+                                top: windowWidth < 768 ? "70px" : "unset",
+                                right: windowWidth < 768 ? "10px" : "unset",
+                                backgroundColor: windowWidth < 768 ? "#fffaea" : "transparent",
+                                padding: windowWidth < 768 ? "10px" : "unset",
+                                boxShadow:
+                                    windowWidth < 768 ? "0px 4px 8px rgba(0, 0, 0, 0.1)" : "none",
+                                borderRadius: windowWidth < 768 ? "5px" : "none",
+                                zIndex: 1000,
+                                justifyContent: windowWidth >= 768 ? "center" : "flex-start", // PC에서 중앙 정렬
                             }}
-                        />
-                    </a>
+                        >
+                            {["profile", "blog", "contact"].map((text) => (
+                                <Link
+                                    key={text}
+                                    to={`/${text}`}
+                                    style={{
+                                        ...styles.link,
+                                        fontSize: `${getFontSize(1.2)}rem`,
+                                        ...(hoveredLink === text ? styles.linkHover : {}),
+                                    }}
+                                    onMouseEnter={() => handleMouseEnter(text)}
+                                    onMouseLeave={handleMouseLeave}
+                                >
+                                    {text}
+                                </Link>
+                            ))}
+                            <a
+                                href="https://www.instagram.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={styles.icon}
+                            >
+                                <img
+                                    src="https://img.icons8.com/ios-glyphs/30/000000/instagram-new.png"
+                                    alt="Instagram"
+                                    style={{
+                                        width: `${getFontSize(2.5)}rem`,
+                                        height: `${getFontSize(2.5)}rem`,
+                                    }}
+                                />
+                            </a>
+                        </div>
+                    )}
                 </div>
-                {/* 가로선 */}
                 <div style={styles.contentLine}></div>
             </div>
         </div>
@@ -137,7 +136,7 @@ const styles = {
         alignItems: "center",
         width: "95%",
         boxSizing: "border-box",
-        flexWrap: "wrap", // 줄바꿈 허용
+        flexWrap: "wrap",
     },
     contentLine: {
         width: "95%",
@@ -185,12 +184,13 @@ const styles = {
         alignItems: "center",
         transition: "all 0.3s ease-in-out",
     },
-    iconHover: {
-        transform: "scale(1.1)",
-    },
-    iconsize: {
-        marginTop: "5px",
+    hamburger: {
+        fontSize: "1.5rem",
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        padding: "5px",
     },
 };
 
-export default TopNav;
+export default TopNav
