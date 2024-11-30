@@ -4,6 +4,7 @@ from datetime import datetime
 
 class TitleCreate(BaseModel): # DB에서 블로그 제목 저장
     title: str
+    product_id: int
     
 class ContentBlock(BaseModel): # DB에서 블로그 글 본문 저장
     post_id: int

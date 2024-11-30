@@ -32,7 +32,11 @@ from app.common.utils import is_valid_file_type, make_pwd_to_hash
 # s3_client = get_s3_client()
 
 async def send_title_data_to_DB(title_data: TitleCreate, db: AsyncSession):
-    new_title = BlogPost(title=title_data.title)
+    new_title = BlogPost(title=title_data.title,
+                         product_id=title_data.product_id)
+    
+    if title_data.product_id == 0 or "":
+        title_data.product_id = 1
     try:
         # 데이터베이스에 새 레코드 추가
         db.add(new_title)
