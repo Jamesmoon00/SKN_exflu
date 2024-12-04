@@ -2,12 +2,21 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File,
 from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.sns import TitleCreate, SNSContent, CommentCreate, CommentResponse, SNSCommentCountReapone
-from app.services.sns_service import send_title_data_to_DB, process_sns_data, get_sns_data_from_DB, create_comment_content, get_comments_contents, delete_comment_data, delete_sns_from_DB, add_like_on_sns_page, get_comments_count_from_DB
+from app.services.sns_service import view_all_sns_data_from_DB, send_title_data_to_DB, process_sns_data, get_sns_data_from_DB, create_comment_content, get_comments_contents, delete_comment_data, delete_sns_from_DB, add_like_on_sns_page, get_comments_count_from_DB
 from app.database.database import get_db
 import json
 
 router = APIRouter(prefix="/sns", tags=["SNS"])
 
+# 블로그 전체 조회
+@router.get("/", summary="SNS 전체 불러오기")
+async def get_blog_data(db: AsyncSession = Depends(get_db)):
+    try:
+        result = await view_all_sns_data_from_DB(db)  # 서비스 로직 호출
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 # sns 제목 저장 API
 @router.post("/title", summary="SNS 제목 저장", status_code=status.HTTP_201_CREATED)
 async def create_title(title_data: TitleCreate, db: AsyncSession = Depends(get_db)):

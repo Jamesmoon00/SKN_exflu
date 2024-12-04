@@ -31,6 +31,21 @@ class BizContacts(Base):
     service_charactors = Column(String(45))
     category_id = Column(Integer, ForeignKey("ProductCategories.category_id"), default = 999)
 
+# blogpost 간편 버전
+class BlogPostSimple(Base):
+    __tablename__ = "blog_posts_1"
+
+    post_id = Column(Integer, primary_key=True, index=True)  # 블로그 ID
+    title = Column(String(255), nullable=False)  # 블로그 제목
+    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    views = Column(Integer, default=0)
+    likes = Column(Integer, default=0)
+    is_ad = Column(Boolean, default=False)  # 광고 여부
+    comments_count = Column(Integer, default=0)  # 댓글 수 필드
+    product_id = Column(Integer, ForeignKey("Products.product_id"))
+    content = Column(String(1000), nullable=False)
+    image = Column(String(100))
+
 # BlogPost 모델 정의
 class BlogPost(Base):
     __tablename__ = "blog_posts"
@@ -92,6 +107,9 @@ class SNSPost(Base):
 
     # 블록 관계 설정
     blocks = relationship("ContentBlockForSNS", back_populates="sns_post")
+    
+    # BlogComment 관계 설정
+    comments = relationship("SNSComment", back_populates="sns_post")
 
 class ContentBlockForSNS(Base):
     __tablename__ = "content_blocks_for_sns"
@@ -114,42 +132,68 @@ class SNSComment(Base):
     comment_password = Column(String(50), nullable=False)
     comment_content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    # SNSPost 관계 설정
+    sns_post = relationship("SNSPost", back_populates="comments")
 
 class ProductCategories(Base):
-    __tablename__='ProductCategories'
+    __tablename__ = 'ProductCategories'
 
     category_id = Column(Integer, primary_key=True, index=True)
     category_name = Column(String(50), unique=True)
+
+    # Products 관계 설정
+    products = relationship("Products", back_populates="category")
+
 
 class Products(Base):
     __tablename__ = 'Products'
 
     product_id = Column(Integer, primary_key=True, index=True)
-    category_id = Column(Integer)
+    category_id = Column(Integer, ForeignKey("ProductCategories.category_id"))
     product_name = Column(String(50))
     brand = Column(String(50))
     model = Column(String(50))
+
+    # Categories 관계 설정
+    category = relationship("ProductCategories", back_populates="products")
+
+    # Specifications 관계 설정
+    laptop_specs = relationship("Specifications_laptop", back_populates="product")
+    smartphone_specs = relationship("Specifications_smartphone", back_populates="product")
+    tablet_specs = relationship("Specifications_tabletpc", back_populates="product")
+
 
 class Specifications_laptop(Base):
     __tablename__ = 'Specifications_laptop'
 
     spec_id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer)
+    product_id = Column(Integer, ForeignKey("Products.product_id"))
     spec_name = Column(String(100))
     spec_value = Column(String(100))
+
+    # Products 관계 설정
+    product = relationship("Products", back_populates="laptop_specs")
+
 
 class Specifications_smartphone(Base):
     __tablename__ = 'Specifications_smartphone'
 
     spec_id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer)
+    product_id = Column(Integer, ForeignKey("Products.product_id"))
     spec_name = Column(String(100))
     spec_value = Column(String(100))
+
+    # Products 관계 설정
+    product = relationship("Products", back_populates="smartphone_specs")
+
 
 class Specifications_tabletpc(Base):
     __tablename__ = 'Specifications_tabletpc'
 
     spec_id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer)
+    product_id = Column(Integer, ForeignKey("Products.product_id"))
     spec_name = Column(String(100))
     spec_value = Column(String(100))
+
+    # Products 관계 설정
+    product = relationship("Products", back_populates="tablet_specs")

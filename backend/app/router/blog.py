@@ -9,7 +9,7 @@ import json
 router = APIRouter(prefix="/blog", tags=["Blog"])
 
 # 블로그 전체 조회
-@router.get("/", summary="블로그 제목, 글 내용 불러오기 + 조회수 상승")
+@router.get("/", summary="블로그 전체 불러오기")
 async def get_blog_data(db: AsyncSession = Depends(get_db)):
     try:
         result = await view_all_blog_data_from_DB(db)  # 서비스 로직 호출

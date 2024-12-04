@@ -1,5 +1,5 @@
 from app.schemas.blog import CommentDelete, TitleCreate, CommentResponse,CommentCreate
-from app.database.models import BlogPost, ContentBlock, BlogComment
+from app.database.models import BlogPost, ContentBlock, BlogComment, BlogPostSimple
 from typing import Optional
 from app.common.consts import BUCKET_NAME, REGION_NAME
 from app.common.config import s3_client
@@ -37,13 +37,9 @@ async def view_all_blog_data_from_DB(db: AsyncSession):
     데이터베이스에서 모든 BlogPost 데이터를 검색하고, 관련된 ContentBlock 및 BlogComment 데이터를 함께 반환합니다.
     """
     try:
-        # 1. BlogPost, ContentBlock, BlogComment를 모두 로드
+        # 1. BlogPost를 로드 (blocks와 comments 로드는 제외, 필요 시 추가 가능)
         blog_posts_query = await db.execute(
-            select(BlogPost)
-            .options(
-                selectinload(BlogPost.blocks),        # ContentBlock 미리 로드
-                selectinload(BlogPost.comments)       # BlogComment 미리 로드
-            )
+            select(BlogPostSimple)  # BlogPostSimple 사용
         )
         blog_posts = blog_posts_query.scalars().all()
 
@@ -61,24 +57,9 @@ async def view_all_blog_data_from_DB(db: AsyncSession):
                 "likes": blog_post.likes,
                 "is_ad": blog_post.is_ad,
                 "comments_count": blog_post.comments_count,
-                "blocks": [
-                    {
-                        "block_type": block.block_type,
-                        "content": block.content,
-                        "block_order": block.block_order,
-                    }
-                    for block in blog_post.blocks  # 미리 로드된 blocks 사용
-                ],
-                "comments": [
-                    {
-                        "comment_id": comment.comment_id,
-                        "post_id": comment.post_id,
-                        "comment_name": comment.comment_name,
-                        "comment_content": comment.comment_content,
-                        "created_at": comment.created_at,
-                    }
-                    for comment in blog_post.comments  # 미리 로드된 comments 사용
-                ],
+                "product_id": blog_post.product_id,  # 새로운 필드
+                "content": blog_post.content,        # 새로운 필드
+                "image": blog_post.image,            # 새로운 필드
             }
             for blog_post in blog_posts
         ]
@@ -90,6 +71,56 @@ async def view_all_blog_data_from_DB(db: AsyncSession):
         # 기타 예상치 못한 에러 처리
         print(f"Error in view_all_blog_data_from_DB: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+# async def view_all_blog_data_from_DB(db: AsyncSession):
+#     """
+#     데이터베이스에서 모든 BlogPost 데이터를 검색하고, 관련된 ContentBlock 및 BlogComment 데이터를 함께 반환합니다.
+#     """
+#     try:
+#         # 1. BlogPost, ContentBlock, BlogComment를 모두 로드
+#         blog_posts_query = await db.execute(
+#             select(BlogPost)
+#             .options(
+#                 selectinload(BlogPost.blocks),        # ContentBlock 미리 로드
+#                 selectinload(BlogPost.comments)       # BlogComment 미리 로드
+#             )
+#         )
+#         blog_posts = blog_posts_query.scalars().all()
+
+#         # 2. BlogPost가 존재하지 않을 경우 빈 리스트 반환
+#         if not blog_posts:
+#             return []
+
+#         # 3. 데이터 변환 (JSON 형태로 반환)
+#         response_data = [
+#             {
+#                 "post_id": blog_post.post_id,
+#                 "title": blog_post.title,
+#                 "created_at": blog_post.created_at,
+#                 "views": blog_post.views,
+#                 "likes": blog_post.likes,
+#                 "is_ad": blog_post.is_ad,
+#                 "comments_count": blog_post.comments_count,
+#                 "blocks": [
+#                     {
+#                         "block_type": block.block_type,
+#                         "content": block.content,
+#                         "block_order": block.block_order,
+#                     }
+#                     for block in blog_post.blocks  # 미리 로드된 blocks 사용
+#                 ],
+#             }
+#             for blog_post in blog_posts
+#         ]
+
+#         # 4. 반환 데이터
+#         return response_data
+
+#     except Exception as e:
+#         # 기타 예상치 못한 에러 처리
+#         print(f"Error in view_all_blog_data_from_DB: {e}")
+#         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 async def send_title_data_to_DB(title_data: TitleCreate, db: AsyncSession):
