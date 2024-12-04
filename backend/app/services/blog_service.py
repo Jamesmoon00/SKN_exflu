@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from app.common.utils import is_valid_file_type, make_pwd_to_hash
+from sqlalchemy.orm import selectinload
 
 ###########################검증 코드셋##############################
 # # 비밀번호 해싱
@@ -31,12 +32,68 @@ from app.common.utils import is_valid_file_type, make_pwd_to_hash
 # # AWS S3 클라이언트
 # s3_client = get_s3_client()
 
+async def view_all_blog_data_from_DB(db: AsyncSession):
+    """
+    데이터베이스에서 모든 BlogPost 데이터를 검색하고, 관련된 ContentBlock 및 BlogComment 데이터를 함께 반환합니다.
+    """
+    try:
+        # 1. BlogPost, ContentBlock, BlogComment를 모두 로드
+        blog_posts_query = await db.execute(
+            select(BlogPost)
+            .options(
+                selectinload(BlogPost.blocks),        # ContentBlock 미리 로드
+                selectinload(BlogPost.comments)       # BlogComment 미리 로드
+            )
+        )
+        blog_posts = blog_posts_query.scalars().all()
+
+        # 2. BlogPost가 존재하지 않을 경우 빈 리스트 반환
+        if not blog_posts:
+            return []
+
+        # 3. 데이터 변환 (JSON 형태로 반환)
+        response_data = [
+            {
+                "post_id": blog_post.post_id,
+                "title": blog_post.title,
+                "created_at": blog_post.created_at,
+                "views": blog_post.views,
+                "likes": blog_post.likes,
+                "is_ad": blog_post.is_ad,
+                "comments_count": blog_post.comments_count,
+                "blocks": [
+                    {
+                        "block_type": block.block_type,
+                        "content": block.content,
+                        "block_order": block.block_order,
+                    }
+                    for block in blog_post.blocks  # 미리 로드된 blocks 사용
+                ],
+                "comments": [
+                    {
+                        "comment_id": comment.comment_id,
+                        "post_id": comment.post_id,
+                        "comment_name": comment.comment_name,
+                        "comment_content": comment.comment_content,
+                        "created_at": comment.created_at,
+                    }
+                    for comment in blog_post.comments  # 미리 로드된 comments 사용
+                ],
+            }
+            for blog_post in blog_posts
+        ]
+
+        # 4. 반환 데이터
+        return response_data
+
+    except Exception as e:
+        # 기타 예상치 못한 에러 처리
+        print(f"Error in view_all_blog_data_from_DB: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 async def send_title_data_to_DB(title_data: TitleCreate, db: AsyncSession):
-    new_title = BlogPost(title=title_data.title,
-                         product_id=title_data.product_id)
-    
-    if title_data.product_id == 0 or "":
-        title_data.product_id = 1
+    new_title = BlogPost(title=title_data.title)
     try:
         # 데이터베이스에 새 레코드 추가
         db.add(new_title)
