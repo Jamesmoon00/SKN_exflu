@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.database import get_db
 from app.services.google_auth import google_login_redirect, handle_google_callback
 
-router = APIRouter()
+router = APIRouter(tags=["Login"])
 
 @router.get("/auth/google")
 async def google_login(request: Request):
