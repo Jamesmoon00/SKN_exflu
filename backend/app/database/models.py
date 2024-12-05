@@ -3,6 +3,16 @@ from sqlalchemy import Column, Integer, String, Text, Enum, ForeignKey, DateTime
 from datetime import datetime, timedelta
 from sqlalchemy.orm import relationship
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    refresh_token = Column(String, nullable=True)  # Refresh Token 저장
+
+
 # B2B 비즈니스 모델 정의
 class BizInfo(Base):
     __tablename__ = "biz_info"
