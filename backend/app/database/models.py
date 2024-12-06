@@ -10,6 +10,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=True)
     phone = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
     refresh_token = Column(String, nullable=True)  # Refresh Token 저장
 
 

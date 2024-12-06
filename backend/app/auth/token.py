@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from app.common.config import get_parameter
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 
 SECRET_KEY = get_parameter("/MYAPP/GOOGLE/AUTH/SECRETKEY")
 ALGORITHM = "HS256"
@@ -18,18 +18,35 @@ def verify_access_token(token: str):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         exp = payload.get("exp")
         if exp and datetime.utcnow().timestamp() > exp:
-            raise HTTPException(status_code=401, detail="Token expired")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
         return payload
-    except JWTError as e:
-        raise HTTPException(status_code=401, detail=f"Invalid token: {e}")
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-# 인증된 사용자 확인
 def get_current_user(token: str = Depends(oauth2_scheme)):
-    payload = verify_access_token(token)
-    user_email = payload.get("sub")
-    if not user_email:
-        raise HTTPException(status_code=401, detail="Invalid user")
-    return user_email
+    try:
+        payload = verify_access_token(token)
+        user_email = payload.get("sub")
+        if not user_email:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="사용자 정보를 확인할 수 없습니다. 다시 로그인하세요.",
+            )
+        return user_email
+    except HTTPException as e:
+        # 토큰 만료 예외 처리
+        if e.status_code == status.HTTP_401_UNAUTHORIZED:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="토큰이 만료되었습니다. Refresh Token을 사용하여 새 Access Token을 요청하세요.",
+                headers={"WWW-Authenticate": "Bearer"},  # 클라이언트가 이 헤더를 확인 가능
+            )
+        raise e
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="유효하지 않은 토큰입니다.",
+        )
 
 def create_access_token(data: dict):
     """
