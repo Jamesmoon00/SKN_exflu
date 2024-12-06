@@ -29,6 +29,7 @@ pyjwt              # JSON Web Token 인증
 python-jose
 passlib[bcrypt]     # 비밀번호 해시화
 itsdangerous
+authlib
 
 # 데이터베이스 마이그레이션 (선택 사항)
 # alembic==1.12.0   # SQLAlchemy 마이그레이션 도구
