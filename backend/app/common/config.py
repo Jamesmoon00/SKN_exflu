@@ -32,6 +32,12 @@ s3_key = get_parameter("/MYAPP/S3/KEY")
 # DATABASE_URL 구성
 DATABASE_URL = f"mysql+asyncmy://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
 
+# KAKAO AUTH
+
+kakao_id = get_parameter("/MYAPP/KAKAO/AUTH/NAME")
+kakao_pwd = get_parameter("/MYAPP/KAKAO/AUTH/PWD")
+kakao_redirect_url = "https://backdocsend.jamesmoon.click/auth/kakao/callback"
+
 # S3 클라이언트 생성
 s3_client = boto3.client(
     "s3",

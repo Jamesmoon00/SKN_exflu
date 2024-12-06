@@ -1,4 +1,4 @@
-from app.router import blog, core, core_check, process_check, healthcheck, test, sns, biz_info, biz_contacts, google_auth
+from app.router import blog, core, core_check, process_check, healthcheck, test, sns, biz_info, biz_contacts, google_auth, kakao_auth
 from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.logger import setup_logging
@@ -53,6 +53,7 @@ app.include_router(blog.router)
 app.include_router(sns.router)
 app.include_router(core.router)
 app.include_router(google_auth.router)
+app.include_router(kakao_auth.router)
 app.include_router(biz_info.router)
 app.include_router(biz_contacts.router)
 app.include_router(core_check.router)
