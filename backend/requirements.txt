@@ -25,8 +25,10 @@ pytest             # 테스트 프레임워크
 httpx              # 비동기 HTTP 클라이언트
 
 # JWT 및 인증 (필요 시 활성화)
-# pyjwt==2.7.0      # JSON Web Token 인증
-passlib[bcrypt]  # 비밀번호 해시화
+pyjwt              # JSON Web Token 인증
+python-jose
+passlib[bcrypt]     # 비밀번호 해시화
+itsdangerous
 
 # 데이터베이스 마이그레이션 (선택 사항)
 # alembic==1.12.0   # SQLAlchemy 마이그레이션 도구
