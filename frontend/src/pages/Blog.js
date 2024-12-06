@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
-import profileImage from "../assets/img/eddy_blog.png";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Write from "../components/board/SideCard"
 import SideCard from "../components/board/SideCard";
 
 const Blog = () => {
     const [posts, setPosts] = useState([]); // 게시글 데이터를 저장할 상태
+   
     const [showSideCard, setShowSideCard] = useState(true); // SideCard 표시 여부 상태
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const navigate = useNavigate();
+    const formatDate = (dateString) => {
+        if(!dateString) return "";
+        return dateString.split("T")[0];
+    }
 
     useEffect(() => {
         // 서버에서 데이터 가져오기
@@ -15,7 +20,7 @@ const Blog = () => {
             try {
                 const response = await axios.get(process.env.REACT_APP_SERVER_URL); // 서버 API URL
                 setPosts(response.data); // 데이터를 상태에 저장
-                console.log(response.data)
+                // console.log(response.data)
             } catch (error) {
                 console.error("데이터를 가져오는 중 오류 발생:", error);
             }
@@ -34,6 +39,9 @@ const Blog = () => {
         window.addEventListener("resize", handleResize); // 리사이즈 이벤트 추가
         return () => window.removeEventListener("resize", handleResize); // 이벤트 제거
     }, []);
+    
+    // 게시글 클릭 시 상세 내용 가져오기
+    
 
 
     return (
@@ -63,10 +71,14 @@ const Blog = () => {
                 <div>
                     {posts.length > 0 ? (
                         posts.map((post, index) => (
-                            <div key={post.id} style={styles.postItem}>
+                            <div
+                                key={post.post_id}
+                                style={{ ...styles.postItem, cursor: "pointer" }} // 클릭 가능 스타일 추가
+                                onClick={() => navigate(`/blog/${post.post_id}`)} // 게시글 상세 페이지로 이동
+                            >
                                 <span style={styles.postNum}>{index + 1}</span>
                                 <span style={styles.postTitle}>{post.title}</span>
-                                <span style={styles.postDate}>{post.date}</span>
+                                <span style={styles.postDate}>{formatDate(post.created_at)}</span>
                             </div>
                         ))
                     ) : (
@@ -75,8 +87,7 @@ const Blog = () => {
                 </div>
             </div>
 
-            {/* write */}
-            {/* <Write /> */}
+            
         </div>
     );
 };
@@ -102,8 +113,8 @@ const styles = {
     blogHeader: {
         borderBottom: "2px solid #F1D1A3",
         paddingBottom: "10px",
-        marginBottom: "20px",
-       
+        marginBottom: "0px",
+        
   
     },
     postCount: {
@@ -132,9 +143,11 @@ const styles = {
     postItem: {
         display: "flex",
         justifyContent: "space-between",
-        padding: "10px 0",
+        padding: "12px 10px",
         borderBottom: "1px solid #f5e4ae",
         fontSize: "0.9rem",
+        
+
     },
 };
 
