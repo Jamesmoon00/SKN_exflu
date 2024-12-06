@@ -11,7 +11,7 @@ async def google_login_redirect(request):
     """
     구글 로그인 리다이렉션 URL 생성
     """
-    redirect_uri = "https://www.jamesmoon.click/auth/google/callback"
+    redirect_uri = "https://backdocsend.jamesmoon.click/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 async def handle_google_callback(request, db: AsyncSession):
