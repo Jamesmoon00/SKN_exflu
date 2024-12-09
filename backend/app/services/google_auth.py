@@ -81,10 +81,10 @@ async def handle_google_callback(request: Request, db: AsyncSession):
         redirect_url = "https://www.jamesmoon.click/contact"
         response = RedirectResponse(url=redirect_url, status_code=302)
         response.set_cookie(
-            key="access_token", value=access_token, httponly=True, samesite="Lax", secure=False
+            key="access_token", value=access_token, httponly=True, samesite="Lax", secure=True
         )
         response.set_cookie(
-            key="refresh_token", value=refresh_token, httponly=True, samesite="Lax", secure=False
+            key="refresh_token", value=refresh_token, httponly=True, samesite="Lax", secure=True
         )
         return response
 
