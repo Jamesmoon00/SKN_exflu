@@ -11,49 +11,31 @@ const NoPage = () => {
     const [isHovered, setIsHovered] = useState(false); // hover 상태 관리
 
     const handleLoginSuccess = async (credentialResponse) => {
-        try {
-            console.log("Google Token:", credentialResponse.credential); // Google OAuth Token 확인
-
-            // 백엔드로 토큰 전송
-            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}auth/google/`, 
-                {token: credentialResponse.credential},
-                {withCredentials: true 
-            });
-
-            console.log("Logged in user:", response.data);
-
-            // 토큰 저장 (예: localStorage)
-            localStorage.setItem("authToken", response.data.token);
-
-            // 결과 보고서 페이지로 이동
-            // navigate("/contact");
-        } catch (error) {
-            console.error("Error during login:", error);
-            alert("로그인 실패!");
-        }
+        // 백엔드 Google OAuth 시작점으로 리다이렉트
+        window.location.href = "https://backdocsend.jamesmoon.click/auth/google";
     };
 
     return (
-        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-            <div style={styles.container}>
-                <section style={styles.logoSection}>
-                    <img
-                        src={login}
-                        alt="eXflu logo"
-                        style={{
-                            ...styles.logoImage,
-                            width: isMobile ? "70%" : "50%",
-                        }}
-                    />
-                </section>
-                <section style={styles.loginSection}>
-                    <GoogleLogin
-                        onSuccess={handleLoginSuccess} // 로그인 성공 처리
-                        onError={() => alert("로그인 실패!")}
-                    />
-                </section>
-            </div>
-        </GoogleOAuthProvider>
+        
+        <div style={styles.container}>
+            <section style={styles.logoSection}>
+                <img
+                    src={login}
+                    alt="eXflu logo"
+                    style={{
+                        ...styles.logoImage,
+                        width: isMobile ? "70%" : "50%",
+                    }}
+                />
+            </section>
+            <section style={styles.loginSection}>
+                <GoogleLogin
+                    onSuccess={handleLoginSuccess} // 로그인 성공 처리
+                    onError={() => alert("로그인 실패!")}
+                />
+            </section>
+        </div>
+       
     );
 };
 
