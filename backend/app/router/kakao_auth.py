@@ -11,6 +11,7 @@ from app.database.database import get_db
 from app.auth.token import create_access_token, create_refresh_token
 from app.auth.oauth import oauth
 from app.database.models import User
+from app.logger import logger
 
 # 라우터 생성
 router = APIRouter(tags=["kakao login"])
@@ -34,20 +35,23 @@ async def login_kakao():
     # RedirectResponse를 사용하여 리디렉션 응답 생성
     return RedirectResponse(url=kakao_oauth_url)
 
+# Kakao Callback 처리 함수
 @router.get("/auth/kakao/callback", response_class=HTMLResponse)
-# Kakao 콜백 처리
 async def handle_kakao_callback(request: Request, db: AsyncSession = Depends(get_db)):
     try:
         # Step 1: Kakao에서 Access Token 및 사용자 정보 가져오기
         token = await oauth.kakao.authorize_access_token(request)
         if not token:
+            logger.error("Failed to authorize Kakao access token")
             raise HTTPException(status_code=400, detail="Failed to authorize access token")
         
         user_info_response = await oauth.kakao.get("https://kapi.kakao.com/v2/user/me", token=token)
         if not user_info_response:
+            logger.error("Failed to fetch Kakao user info")
             raise HTTPException(status_code=400, detail="Failed to fetch user info")
         
         user_info = user_info_response.json()
+        logger.info(f"Kakao user info: {user_info}")
 
         # Step 2: 사용자 정보 가져오기
         kakao_id = user_info.get("id")  # 고유 ID
@@ -60,6 +64,7 @@ async def handle_kakao_callback(request: Request, db: AsyncSession = Depends(get
             email = f"{kakao_id}@kakao.com"  # 고유 ID 기반의 임시 이메일
 
         if not email:
+            logger.error("Email not found in Kakao user info")
             raise HTTPException(status_code=400, detail="Email not found in Kakao user info")
 
         # Step 3: 데이터베이스에서 사용자 검색 또는 생성
@@ -67,14 +72,16 @@ async def handle_kakao_callback(request: Request, db: AsyncSession = Depends(get
         user = result.scalar()
 
         if not user:
+            # 새로운 사용자 생성
             user = User(email=email, name=name, kakao_id=kakao_id)
             db.add(user)
             await db.commit()
             await db.refresh(user)
 
         # Step 4: Access/Refresh Token 생성
-        access_token = create_access_token(data={"sub": user.email})
-        refresh_token = create_refresh_token(data={"sub": user.email})
+        provider = "kakao"  # Kakao 로그인이므로 provider를 "kakao"로 설정
+        access_token = create_access_token(data={"sub": user.email}, provider=provider)
+        refresh_token = create_refresh_token(data={"sub": user.email}, provider=provider)
 
         # Refresh Token 저장
         user.refresh_token = refresh_token
@@ -89,7 +96,9 @@ async def handle_kakao_callback(request: Request, db: AsyncSession = Depends(get
         response.set_cookie(
             key="refresh_token", value=refresh_token, httponly=True, samesite="Lax", secure=False
         )
+        logger.info(f"Kakao login successful for user: {email}")
         return response
 
     except Exception as e:
+        logger.error(f"Exception in Kakao callback: {e}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")

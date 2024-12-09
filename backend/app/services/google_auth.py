@@ -23,6 +23,7 @@ async def google_login_redirect(request: Request):
     return await oauth.google.authorize_redirect(request, redirect_uri, state=state)
 
 
+# Google Callback 처리 함수
 async def handle_google_callback(request: Request, db: AsyncSession):
     try:
         # Step 1: state 검증
@@ -68,8 +69,9 @@ async def handle_google_callback(request: Request, db: AsyncSession):
             await db.refresh(user)
 
         # Step 5: Access/Refresh Token 생성
-        access_token = create_access_token(data={"sub": user.email})
-        refresh_token = create_refresh_token(data={"sub": user.email})
+        provider = "google"  # Google 로그인이므로 provider를 "google"로 설정
+        access_token = create_access_token(data={"sub": user.email}, provider=provider)
+        refresh_token = create_refresh_token(data={"sub": user.email}, provider=provider)
 
         # Refresh Token 저장
         user.refresh_token = refresh_token
@@ -89,6 +91,73 @@ async def handle_google_callback(request: Request, db: AsyncSession):
     except Exception as e:
         logger.error(f"Exception in Google callback: {e}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
+# async def handle_google_callback(request: Request, db: AsyncSession):
+#     try:
+#         # Step 1: state 검증
+#         state = request.query_params.get("state")
+#         saved_state = request.session.get("google_state")
+#         logger.info(f"Received state: {state}, Saved state: {saved_state}")
+        
+#         if state != saved_state:
+#             logger.error(f"State mismatch: Received {state}, Expected {saved_state}")
+#             raise HTTPException(status_code=400, detail="Invalid state parameter")
+
+#         # Step 2: Google에서 토큰 및 사용자 정보 가져오기
+#         token = await oauth.google.authorize_access_token(request)
+#         logger.info(f"Token: {token}")
+        
+#         if not token:
+#             logger.error("Failed to retrieve token")
+#             raise HTTPException(status_code=400, detail="Failed to authorize access token")
+
+#         user_info = token.get("userinfo")
+#         logger.info(f"User info: {user_info}")
+        
+#         if not user_info:
+#             logger.error(f"Token missing userinfo: {token}")
+#             raise HTTPException(status_code=400, detail="User info not found in token")
+
+#         # Step 3: 사용자 정보 가져오기
+#         email = user_info.get("email")
+#         name = user_info.get("name", "Unknown User")
+#         logger.info(f"User email: {email}, User name: {name}")
+
+#         if not email:
+#             raise HTTPException(status_code=400, detail="Email not found in user info")
+
+#         # Step 4: 데이터베이스에서 사용자 검색 또는 생성
+#         result = await db.execute(select(User).where(User.email == email))
+#         user = result.scalar()
+
+#         if not user:
+#             user = User(email=email, name=name)
+#             db.add(user)
+#             await db.commit()
+#             await db.refresh(user)
+
+#         # Step 5: Access/Refresh Token 생성
+#         access_token = create_access_token(data={"sub": user.email})
+#         refresh_token = create_refresh_token(data={"sub": user.email})
+
+#         # Refresh Token 저장
+#         user.refresh_token = refresh_token
+#         await db.commit()
+
+#         # Step 6: RedirectResponse로 리디렉트 처리
+#         redirect_url = "https://www.jamesmoon.click/contact"
+#         response = RedirectResponse(url=redirect_url, status_code=302)
+#         response.set_cookie(
+#             key="access_token", value=access_token, httponly=True, samesite="Lax", secure=False
+#         )
+#         response.set_cookie(
+#             key="refresh_token", value=refresh_token, httponly=True, samesite="Lax", secure=False
+#         )
+#         return response
+
+#     except Exception as e:
+#         logger.error(f"Exception in Google callback: {e}")
+#         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
 
