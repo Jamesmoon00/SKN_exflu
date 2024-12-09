@@ -1,22 +1,15 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { useNavigate } from "react-router-dom"; // React Router 사용
 import login from "../../assets/img/Login.png";
 import google from "../../assets/icons/googleLogin.png";
 
 const NoPage = () => {
-    const navigate = useNavigate(); // 페이지 이동 함수
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // 모바일 여부 상태
     const [isHovered, setIsHovered] = useState(false); // hover 상태 관리
-
-    const handleLoginSuccess = async (credentialResponse) => {
+    const handleGoogleLogin = () => {
         // 백엔드 Google OAuth 시작점으로 리다이렉트
         window.location.href = "https://backdocsend.jamesmoon.click/auth/google";
     };
-
     return (
-        
         <div style={styles.container}>
             <section style={styles.logoSection}>
                 <img
@@ -29,13 +22,27 @@ const NoPage = () => {
                 />
             </section>
             <section style={styles.loginSection}>
-                <GoogleLogin
-                    onSuccess={handleLoginSuccess} // 로그인 성공 처리
-                    onError={() => alert("로그인 실패!")}
+                <img
+                    src={google}
+                    alt=""
+                    style={{
+                        ...styles.loginImage,
+                        width: isMobile ? "50%" : "30%",
+                        opacity: isHovered ? 0.4 : 1, // hover 상태에 따라 투명도 변경
+                        transition: "opacity 0.3s ease-in-out", // 부드러운 효과
+                    }}
+                    onMouseEnter={() => {
+                        console.log("Hovered"); // 확인용
+                        setIsHovered(true); // hover 상태 변경
+                    }}
+                    onMouseLeave={() => {
+                        console.log("Not Hovered"); // 확인용
+                        setIsHovered(false); // hover 상태 해제
+                    }}
+                    onClick={handleGoogleLogin}
                 />
             </section>
         </div>
-       
     );
 };
 
@@ -65,6 +72,10 @@ const styles = {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+    },
+    loginImage: {
+        cursor: "pointer", // 마우스 커서 변경
+        transition: "opacity 0.3s ease-in-out", // 부드러운 효과
     },
 };
 

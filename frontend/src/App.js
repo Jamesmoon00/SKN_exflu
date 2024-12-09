@@ -49,6 +49,7 @@ function App() {
             <Route path="/blog/eee" element={<Write />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/contact/result/" element={<YesorNo />} />
+            <Route path="/contact/report/" element={<Report />}/>
           </Routes>
         </div>
       </div>
