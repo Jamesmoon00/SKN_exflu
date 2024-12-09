@@ -23,7 +23,7 @@ const Write = () => {
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}`);
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}blog/`);
                 const postData = response.data.find((item) => item.post_id === parseInt(id)); // 특정 post_id의 데이터 찾기
                 
                 if (postData) {
@@ -90,7 +90,7 @@ const Write = () => {
     
         const fetchComments = async () => {
             try {
-                const url = `${process.env.REACT_APP_SERVER_URL}comments/${id}`;
+                const url = `${process.env.REACT_APP_SERVER_URL}blog/comments/${id}`;
                 console.log("Fetching comments from:", url);
                 const comment = await axios.get(url);
                 const mappedComments=comment.data.map(comment => ({

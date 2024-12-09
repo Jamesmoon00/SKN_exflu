@@ -59,7 +59,7 @@ const CommentForm = ({ onCommentAdded }) => {
     
         try {
             const response = await axios.post(
-                `${process.env.REACT_APP_SERVER_URL}comments`,
+                `${process.env.REACT_APP_SERVER_URL}blog/comments`,
                 {
                     post_id: Number(id), // 현재 게시글 ID
                     comment_name: writer,

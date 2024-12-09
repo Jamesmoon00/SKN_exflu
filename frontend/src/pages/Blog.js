@@ -18,7 +18,7 @@ const Blog = () => {
         // 서버에서 데이터 가져오기
         const fetchPosts = async () => {
             try {
-                const response = await axios.get(process.env.REACT_APP_SERVER_URL); // 서버 API URL
+                const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}blog/`); // 서버 API URL
                 setPosts(response.data); // 데이터를 상태에 저장
                 // console.log(response.data)
             } catch (error) {
