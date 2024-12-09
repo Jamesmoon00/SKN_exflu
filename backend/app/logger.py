@@ -30,3 +30,6 @@ def setup_logging():
         },
     }
     dictConfig(logging_config)
+
+# 전역 logger 객체 생성
+logger = logging.getLogger("app")
