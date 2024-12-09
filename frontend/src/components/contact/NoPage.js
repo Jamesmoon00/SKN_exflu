@@ -15,8 +15,9 @@ const NoPage = () => {
             console.log("Google Token:", credentialResponse.credential); // Google OAuth Token 확인
 
             // 백엔드로 토큰 전송
-            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/google`, {
-                token: credentialResponse.credential,
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}auth/google/`, 
+                {token: credentialResponse.credential},
+                {withCredentials: true 
             });
 
             console.log("Logged in user:", response.data);
@@ -25,7 +26,7 @@ const NoPage = () => {
             localStorage.setItem("authToken", response.data.token);
 
             // 결과 보고서 페이지로 이동
-            navigate("/report");
+            navigate("/contact");
         } catch (error) {
             console.error("Error during login:", error);
             alert("로그인 실패!");
@@ -33,7 +34,7 @@ const NoPage = () => {
     };
 
     return (
-        <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
             <div style={styles.container}>
                 <section style={styles.logoSection}>
                     <img

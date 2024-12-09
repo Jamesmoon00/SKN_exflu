@@ -1,5 +1,5 @@
 # app/router/google_auth.py
-from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi import APIRouter, Depends, Request, HTTPException, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt, JWTError
 from app.database.database import get_db
@@ -24,9 +24,11 @@ async def google_callback(request: Request, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/auth/refresh", summary="새 Access Token 발급")
-async def refresh_access_token(refresh_token: str):
+async def refresh_access_token(refresh_token: str = Cookie(None)):
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh Token not found in cookies.")
+
     try:
-        # Refresh Token 검증
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_email = payload.get("sub")
         if not user_email:

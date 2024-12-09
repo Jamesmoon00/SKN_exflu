@@ -70,7 +70,7 @@ class BlogCommentSimple(Base):
     comment_name = Column(String(50), nullable=False)
     comment_password = Column(String(50), nullable=False)
     comment_content = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
     
     # BlogPost 관계 설정
     blog_post = relationship("BlogPostSimple", back_populates="comments")
