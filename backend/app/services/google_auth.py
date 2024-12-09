@@ -8,7 +8,7 @@ from app.database.models import User
 from app.auth.oauth import oauth
 from app.auth.token import create_access_token, create_refresh_token
 import secrets
-from app import logger
+from app.logger import logger
 
 async def google_login_redirect(request: Request):
     """
