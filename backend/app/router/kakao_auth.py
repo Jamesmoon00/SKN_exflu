@@ -13,7 +13,7 @@ from app.auth.oauth import oauth
 from app.database.models import User
 
 # 라우터 생성
-router = APIRouter()
+router = APIRouter(tags=["kakao login"])
 
 # Kakao OAuth 정보
 CLIENT_ID = kakao_id

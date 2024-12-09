@@ -6,7 +6,7 @@ from app.database.database import get_db
 from app.services.google_auth import google_login_redirect, handle_google_callback
 from app.auth.token import SECRET_KEY, ALGORITHM, create_access_token
 
-router = APIRouter(tags=["login"])
+router = APIRouter(tags=["google login"])
 
 @router.get("/auth/google")
 async def google_login(request: Request):
