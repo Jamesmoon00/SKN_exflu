@@ -1,5 +1,5 @@
 # app/services/google_auth.py
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -7,16 +7,28 @@ from app.database.database import get_db
 from app.database.models import User
 from app.auth.oauth import oauth
 from app.auth.token import create_access_token, create_refresh_token
+import secrets
 
-async def google_login_redirect(request):
+async def google_login_redirect(request: Request):
     """
     구글 로그인 리다이렉션 URL 생성
     """
+    # Step 1: 고유한 state 생성
+    state = secrets.token_urlsafe(16)
+    request.session["google_state"] = state  # 세션에 state 저장
+
+    # Step 2: 리다이렉션 URL 생성
     redirect_uri = "https://backdocsend.jamesmoon.click/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
-async def handle_google_callback(request, db: AsyncSession):
+async def handle_google_callback(request: Request, db: AsyncSession):
     try:
+        # Step 1: state 검증
+        state = request.query_params.get("state")  # 요청에서 state 값 가져오기
+        saved_state = request.session.get("google_state")  # 세션에서 저장된 state 값 가져오기
+        if state != saved_state:
+            raise HTTPException(status_code=400, detail="Invalid state parameter")
+        
         # Step 1: Google에서 토큰 및 사용자 정보 가져오기
         token = await oauth.google.authorize_access_token(request)
         if not token:
