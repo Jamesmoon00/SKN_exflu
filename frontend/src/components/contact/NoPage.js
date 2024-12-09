@@ -26,7 +26,7 @@ const NoPage = () => {
             localStorage.setItem("authToken", response.data.token);
 
             // 결과 보고서 페이지로 이동
-            navigate("/contact");
+            // navigate("/contact");
         } catch (error) {
             console.error("Error during login:", error);
             alert("로그인 실패!");
