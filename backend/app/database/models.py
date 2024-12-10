@@ -22,10 +22,16 @@ class BizInfo(Base):
     biz_key = Column(Integer, primary_key=True, index=True)
     biz_name = Column(String(50), nullable=False)
     biz_mail = Column(String(50), nullable=False)
-    biz_address = Column(String(255), nullable=False)
+    biz_address = Column(String(255))
     biz_phone = Column(String(255), nullable=False)
     biz_manager = Column(String(50), nullable=False)
     category_id = Column(Integer, ForeignKey("ProductCategories.category_id"), default=999)
+    Q1 = Column(String(100))
+    Q2 = Column(String(100))
+    Q3 = Column(String(100))
+    Q4 = Column(String(100))
+    Q5 = Column(String(100))
+
     
 class BizContacts(Base):
     __tablename__ = "biz_contacts"
