@@ -10,6 +10,40 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from app.common.utils import is_valid_file_type, make_pwd_to_hash
 
+async def search_all_bizinfo_data_from_DB(db: AsyncSession):
+    # 모든 BizInfo 레코드를 조회
+    bizinfo_query = await db.execute(select(BizInfo))
+    bizinfo_list = bizinfo_query.scalars().all()
+    
+    # 만약 DB에 데이터가 없는 경우 404 처리
+    if not bizinfo_list:
+        raise HTTPException(status_code=404, detail="No Biz info found")
+    
+    # category_id가 None인 경우 999로 설정하는 로직을 각 레코드에 적용
+    # 또한, BizInfoResponse 모델에 맞추어 리스트 변환
+    response_list = []
+    for bizinfo in bizinfo_list:
+        if not bizinfo.category_id:
+            bizinfo.category_id = 999
+        
+        response_list.append(BizInfoResponse(
+            biz_key = bizinfo.biz_key,
+            biz_name = bizinfo.biz_name,
+            biz_mail = bizinfo.biz_mail,
+            biz_address = bizinfo.biz_address,
+            biz_phone = bizinfo.biz_phone,
+            biz_manager = bizinfo.biz_manager,
+            category_id = bizinfo.category_id,
+            Q1 = bizinfo.Q1,
+            Q2 = bizinfo.Q2,
+            Q3 = bizinfo.Q3,
+            Q4 = bizinfo.Q4,
+            Q5 = bizinfo.Q5
+        ))
+    
+    return response_list
+
+
 async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: AsyncSession):  # 서비스 로직 호출
     new_bizinfo = BizInfo(
         biz_name = bizinfo_data.biz_name,
