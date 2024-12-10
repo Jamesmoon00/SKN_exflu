@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 
 
 
-const CommentList = ({ comments, onEdit }) => {
+const CommentList = ({ comments, onDelete }) => {
     
     const styles = {
         commentItem: {
@@ -59,7 +59,7 @@ const CommentList = ({ comments, onEdit }) => {
                     </div>
                     <button
                         style={styles.editButton}
-                        onClick={() => onEdit(comment.id, comment.writer, comment.password)}
+                        onClick={() => onDelete(comment.id, comment.writer, comment.password)}
                     >
                         삭제 하기
                     </button>

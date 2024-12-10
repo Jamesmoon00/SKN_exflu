@@ -5,61 +5,72 @@ import SideCard from "../components/board/SideCard";
 
 const Blog = () => {
     const [posts, setPosts] = useState([]); // 게시글 데이터를 저장할 상태
-   
-    const [showSideCard, setShowSideCard] = useState(true); // SideCard 표시 여부 상태
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+    const [pageSize] = useState(12); // 한 페이지당 게시글 수
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // 모바일 여부
+    const [showSideCard, setShowSideCard] = useState(true); // SideCard 표시 여부
     const navigate = useNavigate();
-    const formatDate = (dateString) => {
-        if(!dateString) return "";
-        return dateString.split("T")[0];
-    }
 
     useEffect(() => {
         // 서버에서 데이터 가져오기
         const fetchPosts = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}blog/`); // 서버 API URL
-                setPosts(response.data); // 데이터를 상태에 저장
-                // console.log(response.data)
+               // 최신글 순으로 정렬
+               const sortedPosts = response.data.sort(
+                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+                );
+
+            setPosts(sortedPosts); // 정렬된 데이터 상태에 저장
+            console.log(sortedPosts);
             } catch (error) {
                 console.error("데이터를 가져오는 중 오류 발생:", error);
             }
         };
 
-        fetchPosts(); // 함수 호출
+        fetchPosts();
     }, []); // 컴포넌트가 마운트될 때 한 번 실행
 
     useEffect(() => {
         const handleResize = () => {
-            setShowSideCard(window.innerWidth > 1000); // 768px 이하일 때 SideCard 숨김
+            setShowSideCard(window.innerWidth > 1000);
             setIsMobile(window.innerWidth <= 768);
         };
 
-        handleResize(); // 초기 크기 설정
-        window.addEventListener("resize", handleResize); // 리사이즈 이벤트 추가
-        return () => window.removeEventListener("resize", handleResize); // 이벤트 제거
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, []);
-    
-    // 게시글 클릭 시 상세 내용 가져오기
-    
 
+    // 현재 페이지에 해당하는 데이터만 가져오기
+    const paginatedPosts = posts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+    // 총 페이지 수 계산
+    const totalPages = Math.ceil(posts.length / pageSize);
+
+    // 페이지 변경 핸들러
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
 
     return (
         <div
             style={{
                 ...styles.container,
-                marginLeft: showSideCard ? "45px" : "0", // SideNav가 없으면 marginLeft를 0으로 설정
-                marginRight: isMobile ? "25px" : "45px"
+                marginLeft: showSideCard ? "45px" : "0",
+                marginRight: isMobile ? "25px" : "45px",
             }}
         >
-            {/* 왼쪽 사이드바 */}
-            {/* SideCard는 showSideCard가 true일 때만 렌더링 */}
             {showSideCard && <SideCard />}
-            {/* 오른쪽 게시글 리스트 */}
-            <div style={{...styles.blogList,
-                marginLeft : isMobile ? "20px" : "40px",
-                marginRignt : isMobile ? "-25px" : "0px"
-            }}>
+            <div
+                style={{
+                    ...styles.blogList,
+                    marginLeft: isMobile ? "20px" : "40px",
+                    marginRignt: isMobile ? "-25px" : "0px",
+                }}
+            >
                 <div style={styles.blogHeader}>
                     <p style={styles.postCount}>✏️목록</p>
                     <div style={styles.postHeader}>
@@ -69,30 +80,51 @@ const Blog = () => {
                     </div>
                 </div>
                 <div>
-                    {posts.length > 0 ? (
-                        posts.map((post, index) => (
+                    {paginatedPosts.length > 0 ? (
+                        paginatedPosts.map((post, index) => (
                             <div
                                 key={post.post_id}
-                                style={{ ...styles.postItem, cursor: "pointer" }} // 클릭 가능 스타일 추가
-                                onClick={() => navigate(`/blog/${post.post_id}`)} // 게시글 상세 페이지로 이동
+                                style={{ ...styles.postItem, cursor: "pointer" }}
+                                onClick={() => navigate(`/blog/${post.post_id}`)}
                             >
-                                <span style={styles.postNum}>{index + 1}</span>
+                                <span style={styles.postNum}>
+                                    {index + 1 + (currentPage - 1) * pageSize}
+                                </span>
                                 <span style={styles.postTitle}>{post.title}</span>
-                                <span style={styles.postDate}>{formatDate(post.created_at)}</span>
+                                <span style={styles.postDate}>
+                                    {post.created_at.split("T")[0]}
+                                </span>
                             </div>
                         ))
                     ) : (
                         <p style={{ textAlign: "center" }}>게시글이 없습니다.</p>
                     )}
                 </div>
+                {/* 페이지네이션 */}
+                <div style={styles.pagination}>
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        style={styles.pageButton}
+                    >
+                        이전
+                    </button>
+                    <span>
+                        {currentPage} / {totalPages}
+                    </span>
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        style={styles.pageButton}
+                    >
+                        다음
+                    </button>
+                </div>
             </div>
-
-            
         </div>
     );
 };
 
-// 스타일
 const styles = {
     container: {
         display: "flex",
@@ -101,21 +133,16 @@ const styles = {
         backgroundColor: "#fffaea",
         height: "100vh",
     },
-    sideCard: {
-        width: "25%",
-    },
     blogList: {
         flex: "2.5",
         marginLeft: "40px",
         width: "100%",
-        marginTop: "20px"
+        marginTop: "20px",
     },
     blogHeader: {
         borderBottom: "2px solid #F1D1A3",
         paddingBottom: "10px",
         marginBottom: "0px",
-        
-  
     },
     postCount: {
         fontSize: "1rem",
@@ -126,7 +153,7 @@ const styles = {
         alignItems: "center",
         fontSize: "0.9rem",
         color: "#555",
-        marginTop: "5px"
+        marginTop: "5px",
     },
     postNum: {
         flex: "1",
@@ -143,11 +170,26 @@ const styles = {
     postItem: {
         display: "flex",
         justifyContent: "space-between",
-        padding: "12px 10px",
+        padding: "10px 10px",
         borderBottom: "1px solid #f5e4ae",
         fontSize: "0.9rem",
+    },
+    pagination: {
+        display: "flex",
+        justifyContent: "center", // 가로 중앙 정렬
+        alignItems: "center", // 세로 중앙 정렬
+        padding: "60px 70px 0px",
         
-
+        marginTop: "auto",
+        gap: "10px", // 버튼 간격
+    },
+    pageButton: {
+        padding: "5px 10px",
+        cursor: "pointer",
+        backgroundColor: "#fffaea",
+        border: "1px solid #f5e4ae",
+        borderRadius: "5px",
+        fontSize: "0.9rem",
     },
 };
 

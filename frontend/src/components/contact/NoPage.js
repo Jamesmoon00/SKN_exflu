@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import login from "../../assets/img/Login.png";
 import google from "../../assets/icons/googleLogin.png";
-
+ 
 const NoPage = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // 모바일 여부 상태
     const [isHovered, setIsHovered] = useState(false); // hover 상태 관리
