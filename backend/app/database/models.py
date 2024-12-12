@@ -31,6 +31,7 @@ class BizInfo(Base):
     Q3 = Column(String(100))
     Q4 = Column(String(100))
     Q5 = Column(String(100))
+    outline = Column(String)  # 광고 OUTLINE 필드 추가
 
     
 class BizContacts(Base):

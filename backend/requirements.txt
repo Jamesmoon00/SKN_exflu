@@ -33,3 +33,7 @@ authlib
 
 # 데이터베이스 마이그레이션 (선택 사항)
 # alembic==1.12.0   # SQLAlchemy 마이그레이션 도구
+
+# Open AI
+openai
+anyio

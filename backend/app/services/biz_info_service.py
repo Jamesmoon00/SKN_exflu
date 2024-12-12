@@ -1,14 +1,14 @@
 from app.schemas.biz_info import BizInfoDataRequests, BizInfoResponse
 from app.database.models import BizInfo
-from typing import Optional
+from openai import OpenAI
+import anyio
 from app.common.consts import BUCKET_NAME, REGION_NAME
 from app.common.config import s3_client
 from sqlalchemy import func
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
-from sqlalchemy.exc import IntegrityError
-from app.common.utils import is_valid_file_type, make_pwd_to_hash
+from app.common.config import get_parameter
 
 async def search_all_bizinfo_data_from_DB(db: AsyncSession):
     # 모든 BizInfo 레코드를 조회
@@ -43,36 +43,93 @@ async def search_all_bizinfo_data_from_DB(db: AsyncSession):
     
     return response_list
 
+async def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
+    prompt = f"""
+    다음은 광고 요청 정보다:
+    1. 광고 제품: {bizinfo_data.Q1}
+    2. 광고 기간: {bizinfo_data.Q2}
+    3. 예상 비용: {bizinfo_data.Q3}
+    4. 타겟층: {bizinfo_data.Q4}
+    5. 광고 플랫폼: {bizinfo_data.Q5}
 
-async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: AsyncSession):  # 서비스 로직 호출
-    new_bizinfo = BizInfo(
-        biz_name = bizinfo_data.biz_name,
-        biz_mail = bizinfo_data.biz_mail,
-        biz_address = bizinfo_data.biz_address,
-        biz_phone = bizinfo_data.biz_phone,
-        biz_manager = bizinfo_data.biz_manager,
-        category_id = bizinfo_data.category_id,
-        Q1 = bizinfo_data.Q1,
-        Q2 = bizinfo_data.Q2,
-        Q3 = bizinfo_data.Q3,
-        Q4 = bizinfo_data.Q4,
-        Q5 = bizinfo_data.Q5
-    )
+    위 정보를 바탕으로 광고 OUTLINE을 작성해줘.
+    형식: 머릿말 - 본론(최대 3개 소제목 가능) - 맺음말
+    글의 길이는 500~600자로 제한.
+    """
     try:
+        # lambda 내부에서 client.chat.completions.create를 호출
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "너는 전문 광고 기획자다."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1500
+        )
+        outline = response.choices[0].message.content
+        return outline
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"광고 OUTLINE 생성 중 오류가 발생했습니다: {str(e)}"
+        )
+
+async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: AsyncSession):
+    try:
+        outline = None  # outline 변수 초기화
+        # OpenAI API 키 설정
+        client = OpenAI(
+            api_key=get_parameter("/TEST/CICD/STREAMLIT/OPENAI_API_KEY"),  # This is the default and can be omitted
+        )
+        # 광고 OUTLINE 생성
+        try:
+            # OpenAI API 키 확인
+            if not client:
+                raise HTTPException(
+                    status_code=500, detail="OpenAI API 키가 설정되지 않았습니다."
+                )
+            # 광고 OUTLINE 생성
+            outline = await generate_ad_outline(bizinfo_data, client)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500, detail=f"서버 내부 오류 발생: {str(e)}"
+            )
+        
+        # 데이터베이스에 저장할 기업 정보 객체 생성
+        new_bizinfo = BizInfo(
+            biz_name=bizinfo_data.biz_name,
+            biz_mail=bizinfo_data.biz_mail,
+            biz_address=bizinfo_data.biz_address,
+            biz_phone=bizinfo_data.biz_phone,
+            biz_manager=bizinfo_data.biz_manager,
+            category_id=bizinfo_data.category_id,
+            Q1=bizinfo_data.Q1,
+            Q2=bizinfo_data.Q2,
+            Q3=bizinfo_data.Q3,
+            Q4=bizinfo_data.Q4,
+            Q5=bizinfo_data.Q5,
+            outline=outline  # 생성된 광고 OUTLINE 저장
+        )
+
+        # 데이터 저장 및 커밋
         db.add(new_bizinfo)
         await db.commit()
         await db.refresh(new_bizinfo)
-    except:
+
+        # 성공 응답
+        return {
+            "Message": "기업 정보와 광고 OUTLINE이 성공적으로 저장되었습니다.",
+            "biz_name": bizinfo_data.biz_name,
+            "ad_outline": outline  # 생성된 OUTLINE 포함
+        }
+    except Exception as e:
+        # 오류 발생 시 롤백
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="데이터 저장 중 오류가 발생했습니다.",
+            detail=f"데이터 저장 중 오류가 발생했습니다: {str(e)}"
         )
-    return {
-        "Message": "기업 정보가 성공적으로 저장되었습니다.",
-        "biz_name": bizinfo_data.biz_name,
-    }
-    
 
 async def search_bizinfo_data_from_DB(biz_key:int, db: AsyncSession):
     bizinfo_query = await db.execute(select(BizInfo).where(BizInfo.biz_key == biz_key))
