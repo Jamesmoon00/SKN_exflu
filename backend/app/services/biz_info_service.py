@@ -65,16 +65,10 @@ async def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
-            max_tokens=1500,
-            timeout=10  # 30초 타임아웃 설정
+            max_tokens=700,
         )
         outline = response.choices[0].message.content
         return outline
-    except TimeoutError:
-        raise HTTPException(
-            status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="광고 OUTLINE 생성 시간이 초과되었습니다 (10초)"
-        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
