@@ -38,7 +38,7 @@ async def search_all_bizinfo_data_from_DB(db: AsyncSession):
             price=bizinfo.price,
             main_platform=bizinfo.main_platform,
             event_type=bizinfo.event_type,
-            charator_type=bizinfo.charator_type,
+            charactor_type=bizinfo.charactor_type,
         ))
     
     return response_list
@@ -46,11 +46,11 @@ async def search_all_bizinfo_data_from_DB(db: AsyncSession):
 def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
     prompt = f"""
     다음은 광고 요청 정보다:
-    1. 광고 제품: {bizinfo_data.Q1}
-    2. 광고 기간: {bizinfo_data.Q2}
-    3. 예상 비용: {bizinfo_data.Q3}
-    4. 타겟층: {bizinfo_data.Q4}
-    5. 광고 플랫폼: {bizinfo_data.Q5}
+    1. 광고 제품: {bizinfo_data.products_categories}
+    2. 예상 비용: {bizinfo_data.price}
+    3. 광고 플랫폼: {bizinfo_data.main_platform}
+    4. 광고 방법: {bizinfo_data.event_type}
+    5. 홍보 캐릭터 성별: {bizinfo_data.charactor_type}
 
     위 정보를 바탕으로 광고 OUTLINE을 작성해줘.
     형식: 머릿말 - 본론(최대 3개 소제목 가능) - 맺음말
@@ -118,7 +118,7 @@ async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: Async
             price=bizinfo_data.price,
             main_platform=bizinfo_data.main_platform,
             event_type=bizinfo_data.event_type,
-            charator_type=bizinfo_data.charator_type,
+            charactor_type=bizinfo_data.charactor_type,
             outline=outline,  # 생성된 광고 OUTLINE 저장
             UUID=uuid
         )
@@ -165,7 +165,7 @@ async def search_bizinfo_data_from_DB(biz_key:int, db: AsyncSession):
         price=bizinfo.price,
         main_platform=bizinfo.main_platform,
         event_type=bizinfo.event_type,
-        charator_type=bizinfo.charator_type,
+        charactor_type=bizinfo.charactor_type,
     )
 
 async def delete_bizinfo_data_from_DB(biz_key:int, db: AsyncSession):

@@ -30,7 +30,7 @@ class BizInfo(Base):
     price = Column(String(100))
     main_platform = Column(String(100))
     event_type = Column(String(100))
-    charator_type = Column(String(100))
+    charactor_type = Column(String(100))
     outline = Column(String)  # 광고 OUTLINE 필드 추가
     UUID = Column(String(100))
 
@@ -39,17 +39,17 @@ class BizContacts(Base):
     __tablename__ = "biz_contacts"
     
     order_id = Column(Integer, primary_key=True, index = True)
-    biz_key = Column(Integer, ForeignKey("biz_info.biz_key"))
-    order_date = Column(DateTime, nullable=False, default=datetime.now() + timedelta(hours=9))
-    service_name = Column(String(50), nullable=False)
-    service_info = Column(String(255), nullable=False)
-    budget = Column(Integer, nullable=False)
-    period = Column(Integer, nullable=False)
-    platform = Column(String(50), nullable=False)
+    order_date = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    service_name = Column(String(50))
+    service_info = Column(String(255))
+    budget = Column(Integer)
+    period = Column(Integer)
+    platform = Column(String(50))
     promo_info = Column(String(255))
-    service_target = Column(String(45), nullable=False)
+    service_target = Column(String(45))
     service_charactors = Column(String(45))
     category_id = Column(Integer, ForeignKey("ProductCategories.category_id"), default = 999)
+    UUID = Column(String(100), ForeignKey("biz_info.UUID"))
 
 # blogpost 간편 버전
 class BlogPostSimple(Base):
