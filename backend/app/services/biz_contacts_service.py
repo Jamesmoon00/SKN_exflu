@@ -56,7 +56,6 @@ async def search_bizcontacts_data_from_DB_as_uuid(uuid:int, db: AsyncSession):
     # Pydantic 모델로 변환하여 반환
     return BizContactsDataResponce(
         order_id=bizcontacts.order_id,
-        biz_key=bizcontacts.biz_key,
         order_date=bizcontacts.order_date,
         service_name=bizcontacts.service_name,
         service_info=bizcontacts.service_info,
@@ -93,7 +92,6 @@ async def search_bizcontacts_data_from_DB(order_id:int, db: AsyncSession):
     # Pydantic 모델로 변환하여 반환
     return BizContactsDataResponce(
         order_id=bizcontacts.order_id,
-        biz_key=bizcontacts.biz_key,
         order_date=bizcontacts.order_date,
         service_name=bizcontacts.service_name,
         service_info=bizcontacts.service_info,
