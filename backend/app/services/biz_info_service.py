@@ -43,7 +43,7 @@ async def search_all_bizinfo_data_from_DB(db: AsyncSession):
     
     return response_list
 
-def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
+async def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
     prompt = f"""
     다음은 광고 요청 정보다:
     1. 광고 제품: {bizinfo_data.products_categories}
@@ -98,7 +98,7 @@ async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: Async
                     status_code=500, detail="OpenAI API 키가 설정되지 않았습니다."
                 )
             # 광고 OUTLINE 생성
-            outline = generate_ad_outline(bizinfo_data, client)
+            outline = await generate_ad_outline(bizinfo_data, client)
         except Exception as e:
             raise HTTPException(
                 status_code=500, detail=f"서버 내부 오류 발생: {str(e)}"

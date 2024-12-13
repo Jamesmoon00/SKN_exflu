@@ -6,6 +6,7 @@ from app.services.biz_info_service import insert_bizinfo_data_to_DB, search_bizi
 from app.database.database import get_db
 from app.auth.token import get_current_user  # 인증 함수
 import json
+import logging
 
 router = APIRouter(prefix="/bizinfo", tags=["Business Infomation"])
 
@@ -21,6 +22,7 @@ async def insert_bizinfo(db: AsyncSession = Depends(get_db)):
 # 기업 정보 저장 API
 @router.post("/insert", summary="기업 정보 저장", status_code=status.HTTP_201_CREATED)
 async def insert_bizinfo(bizinfo_data: BizInfoDataRequests, db: AsyncSession = Depends(get_db)):
+    logging.info(f"Request data: {bizinfo_data.json()}")
 # async def insert_bizinfo(bizinfo_data: BizInfoDataRequests, db: AsyncSession = Depends(get_db), current_user: str = Depends(get_current_user)):
     try:
         result = await insert_bizinfo_data_to_DB(bizinfo_data, db)  # 서비스 로직 호출
