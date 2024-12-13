@@ -6,8 +6,8 @@ class BizContactsDataRequests(BaseModel): # DB 저장
     order_date : datetime
     service_name :str
     service_info :str
-    budget :int
-    period :int
+    budget :str
+    period :str
     platform :str
     promo_info :str
     service_target :str
@@ -20,8 +20,8 @@ class BizContactsDataResponce(BaseModel): # DB 호출
     order_date : datetime
     service_name :str
     service_info :str
-    budget :int
-    period :int
+    budget :str
+    period :str
     platform :str
     promo_info :str
     service_target :str
