@@ -27,4 +27,4 @@ EXPOSE 8502
 # 컨테이너 실행 유무 확인 
 HEALTHCHECK CMD curl --fail http://localhost:8502/_stcore/health
 # 웹서버 실행 
-ENTRYPOINT ["streamlit", "run", "llm_model.py", "--server.port=8502", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8502", "--server.address=0.0.0.0"]
