@@ -46,7 +46,7 @@ async def insert_bizcontacts_data_to_DB(bizinfo_data: BizContactsDataRequests, d
         "service_charactors":new_bizinfo.service_charactors,
     }
 
-async def search_bizcontacts_data_from_DB_as_uuid(uuid:int, db: AsyncSession):
+async def search_bizcontacts_data_from_DB_as_uuid(uuid:str, db: AsyncSession):
     bizcontacts_query = await db.execute(select(BizContacts).where(BizContacts.UUID == uuid))
     bizcontacts = bizcontacts_query.scalar_one_or_none()
     
@@ -68,7 +68,7 @@ async def search_bizcontacts_data_from_DB_as_uuid(uuid:int, db: AsyncSession):
         category_id=bizcontacts.category_id,
     )
 
-async def delete_bizcontacts_data_from_DB_as_uuid(uuid:int, db: AsyncSession):
+async def delete_bizcontacts_data_from_DB_as_uuid(uuid:str, db: AsyncSession):
     bizinfo_query = await db.execute(select(BizContacts).where(BizContacts.UUID == uuid))
     bizinfo = bizinfo_query.scalar_one_or_none()
     
