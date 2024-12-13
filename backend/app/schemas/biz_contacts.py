@@ -15,15 +15,15 @@ class BizContactsDataRequests(BaseModel): # DB 저장
     category_id :int
     
     
-class BizContactsDataResponce(BaseModel): # DB 호출
+class BizContactsDataResponse(BaseModel): # DB 호출
     order_id :int
     order_date : datetime
     service_name :str
-    service_info :str
+    service_info :str = ""
     budget :str
-    period :str
+    period :str = ""
     platform :str
-    promo_info :str
-    service_target :str
+    promo_info :str = ""
+    service_target :str = ""
     service_charactors :str
     category_id :int

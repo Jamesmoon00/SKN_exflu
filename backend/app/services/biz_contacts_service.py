@@ -1,4 +1,4 @@
-from app.schemas.biz_contacts import BizContactsDataRequests, BizContactsDataResponce
+from app.schemas.biz_contacts import BizContactsDataRequests, BizContactsDataResponse
 from app.database.models import BizInfo, BizContacts
 from typing import Optional
 from app.common.consts import BUCKET_NAME, REGION_NAME
@@ -54,7 +54,7 @@ async def search_bizcontacts_data_from_DB_as_uuid(uuid:int, db: AsyncSession):
         raise HTTPException(status_code=404, detail="Biz info not found")
     
     # Pydantic 모델로 변환하여 반환
-    return BizContactsDataResponce(
+    return BizContactsDataResponse(
         order_id=bizcontacts.order_id,
         order_date=bizcontacts.order_date,
         service_name=bizcontacts.service_name,
@@ -90,7 +90,7 @@ async def search_bizcontacts_data_from_DB(order_id:int, db: AsyncSession):
         raise HTTPException(status_code=404, detail="Biz info not found")
     
     # Pydantic 모델로 변환하여 반환
-    return BizContactsDataResponce(
+    return BizContactsDataResponse(
         order_id=bizcontacts.order_id,
         order_date=bizcontacts.order_date,
         service_name=bizcontacts.service_name,
