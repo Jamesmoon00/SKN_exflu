@@ -26,12 +26,13 @@ class BizInfo(Base):
     biz_phone = Column(String(255), nullable=False)
     biz_manager = Column(String(50), nullable=False)
     category_id = Column(Integer, ForeignKey("ProductCategories.category_id"), default=999)
-    Q1 = Column(String(100))
-    Q2 = Column(String(100))
-    Q3 = Column(String(100))
-    Q4 = Column(String(100))
-    Q5 = Column(String(100))
+    products_categories = Column(String(100))
+    price = Column(String(100))
+    main_platform = Column(String(100))
+    event_type = Column(String(100))
+    charator_type = Column(String(100))
     outline = Column(String)  # 광고 OUTLINE 필드 추가
+    UUID = Column(String(100))
 
     
 class BizContacts(Base):

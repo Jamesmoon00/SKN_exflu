@@ -9,11 +9,12 @@ class BizInfoDataRequests(BaseModel): # DB에서 블로그 제목 저장
     biz_phone: str
     biz_manager: str
     category_id: int = 999
-    Q1:str
-    Q2:str
-    Q3:str
-    Q4:str
-    Q5:str
+    products_categories:str
+    price:str
+    main_platform:str
+    event_type:str
+    charator_type:str
+    
     
 class BizInfoResponse(BaseModel):
     biz_key: int
@@ -23,10 +24,10 @@ class BizInfoResponse(BaseModel):
     biz_phone: str
     biz_manager: str
     category_id: int = 999
-    Q1:str
-    Q2:str
-    Q3:str
-    Q4:str
-    Q5:str
+    products_categories:str
+    price:str
+    main_platform:str
+    event_type:str
+    charator_type:str
     class Config:
         from_attributes = True

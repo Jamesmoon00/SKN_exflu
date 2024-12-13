@@ -1,9 +1,9 @@
 from app.schemas.biz_info import BizInfoDataRequests, BizInfoResponse
 from app.database.models import BizInfo
 from openai import OpenAI
-import anyio
 from app.common.consts import BUCKET_NAME, REGION_NAME
 from app.common.config import s3_client
+from app.common.utils import create_uuid
 from sqlalchemy import func
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,16 +34,16 @@ async def search_all_bizinfo_data_from_DB(db: AsyncSession):
             biz_phone = bizinfo.biz_phone,
             biz_manager = bizinfo.biz_manager,
             category_id = bizinfo.category_id,
-            Q1 = bizinfo.Q1,
-            Q2 = bizinfo.Q2,
-            Q3 = bizinfo.Q3,
-            Q4 = bizinfo.Q4,
-            Q5 = bizinfo.Q5
+            products_categories=bizinfo.products_categories,
+            price=bizinfo.price,
+            main_platform=bizinfo.main_platform,
+            event_type=bizinfo.event_type,
+            charator_type=bizinfo.charator_type,
         ))
     
     return response_list
 
-async def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
+def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
     prompt = f"""
     다음은 광고 요청 정보다:
     1. 광고 제품: {bizinfo_data.Q1}
@@ -57,7 +57,7 @@ async def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
     글의 길이는 500~600자로 제한.
     """
     try:
-        # lambda 내부에서 client.chat.completions.create를 호출
+        # 30초 타임아웃으로 OpenAI API 호출
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -65,15 +65,23 @@ async def generate_ad_outline(bizinfo_data: BizInfoDataRequests, client):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
-            max_tokens=1500
+            max_tokens=1500,
+            timeout=10  # 30초 타임아웃 설정
         )
         outline = response.choices[0].message.content
         return outline
+    except TimeoutError:
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="광고 OUTLINE 생성 시간이 초과되었습니다 (10초)"
+        )
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
             detail=f"광고 OUTLINE 생성 중 오류가 발생했습니다: {str(e)}"
         )
+    
+
 
 async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: AsyncSession):
     try:
@@ -90,11 +98,13 @@ async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: Async
                     status_code=500, detail="OpenAI API 키가 설정되지 않았습니다."
                 )
             # 광고 OUTLINE 생성
-            outline = await generate_ad_outline(bizinfo_data, client)
+            outline = generate_ad_outline(bizinfo_data, client)
         except Exception as e:
             raise HTTPException(
                 status_code=500, detail=f"서버 내부 오류 발생: {str(e)}"
             )
+            
+        uuid = create_uuid()
         
         # 데이터베이스에 저장할 기업 정보 객체 생성
         new_bizinfo = BizInfo(
@@ -104,12 +114,13 @@ async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: Async
             biz_phone=bizinfo_data.biz_phone,
             biz_manager=bizinfo_data.biz_manager,
             category_id=bizinfo_data.category_id,
-            Q1=bizinfo_data.Q1,
-            Q2=bizinfo_data.Q2,
-            Q3=bizinfo_data.Q3,
-            Q4=bizinfo_data.Q4,
-            Q5=bizinfo_data.Q5,
-            outline=outline  # 생성된 광고 OUTLINE 저장
+            products_categories=bizinfo_data.products_categories,
+            price=bizinfo_data.price,
+            main_platform=bizinfo_data.main_platform,
+            event_type=bizinfo_data.event_type,
+            charator_type=bizinfo_data.charator_type,
+            outline=outline,  # 생성된 광고 OUTLINE 저장
+            UUID=uuid
         )
 
         # 데이터 저장 및 커밋
@@ -121,7 +132,8 @@ async def insert_bizinfo_data_to_DB(bizinfo_data: BizInfoDataRequests, db: Async
         return {
             "Message": "기업 정보와 광고 OUTLINE이 성공적으로 저장되었습니다.",
             "biz_name": bizinfo_data.biz_name,
-            "ad_outline": outline  # 생성된 OUTLINE 포함
+            "ad_outline": outline,  # 생성된 OUTLINE 포함
+            "User-ID" : uuid
         }
     except Exception as e:
         # 오류 발생 시 롤백
@@ -149,11 +161,11 @@ async def search_bizinfo_data_from_DB(biz_key:int, db: AsyncSession):
         biz_phone = bizinfo.biz_phone,
         biz_manager = bizinfo.biz_manager,
         category_id = bizinfo.category_id,
-        Q1 = bizinfo.Q1,
-        Q2 = bizinfo.Q2,
-        Q3 = bizinfo.Q3,
-        Q4 = bizinfo.Q4,
-        Q5 = bizinfo.Q5
+        products_categories=bizinfo.products_categories,
+        price=bizinfo.price,
+        main_platform=bizinfo.main_platform,
+        event_type=bizinfo.event_type,
+        charator_type=bizinfo.charator_type,
     )
 
 async def delete_bizinfo_data_from_DB(biz_key:int, db: AsyncSession):

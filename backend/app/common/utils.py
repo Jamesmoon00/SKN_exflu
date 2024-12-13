@@ -47,3 +47,9 @@ async def upload_image_to_s3(file: UploadFile) -> str:
     except Exception as e:
         print(f"Error uploading image to S3: {e}")
         raise HTTPException(status_code=500, detail="Failed to upload image")
+    
+    
+def create_uuid():
+    # UUID1 생성
+    uuid1 = uuid.uuid1()
+    return uuid1
