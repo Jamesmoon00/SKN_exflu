@@ -82,6 +82,48 @@ async def delete_bizcontacts_data_from_DB_as_uuid(uuid:str, db: AsyncSession):
         await db.rollback()
         raise HTTPException(status_code=400, detail="Can't commit Biz info to DB")
 
+async def update_bizcontacts_data_as_uuid(uuid: str, db: AsyncSession, update_data: dict):
+    # UUID로 기존 데이터 조회
+    bizinfo_query = await db.execute(select(BizContacts).where(BizContacts.UUID == uuid))
+    bizinfo = bizinfo_query.scalar_one_or_none()
+
+    if not bizinfo:
+        raise HTTPException(status_code=404, detail="Biz info not found")
+
+    # 데이터 수정
+    try:
+        for key, value in update_data.items():
+            if hasattr(bizinfo, key):
+                setattr(bizinfo, key, value)  # ORM 객체의 속성 업데이트
+
+        await db.commit()  # 트랜잭션 커밋
+        await db.refresh(bizinfo)  # 업데이트된 객체 새로고침
+        return bizinfo
+    except Exception as e:
+        await db.rollback()  # 트랜잭션 롤백
+        raise HTTPException(status_code=400, detail=f"Error: {str(e)}")
+    
+async def update_bizcontacts_data(order_id:int, db: AsyncSession, update_data: dict):
+    # order_id로 기존 데이터 조회
+    bizinfo_query = await db.execute(select(BizContacts).where(BizContacts.order_id == order_id))
+    bizinfo = bizinfo_query.scalar_one_or_none()
+
+    if not bizinfo:
+        raise HTTPException(status_code=404, detail="Biz info not found")
+
+    # 데이터 수정
+    try:
+        for key, value in update_data.items():
+            if hasattr(bizinfo, key):
+                setattr(bizinfo, key, value)  # ORM 객체의 속성 업데이트
+
+        await db.commit()  # 트랜잭션 커밋
+        await db.refresh(bizinfo)  # 업데이트된 객체 새로고침
+        return bizinfo
+    except Exception as e:
+        await db.rollback()  # 트랜잭션 롤백
+        raise HTTPException(status_code=400, detail=f"Error: {str(e)}")
+
 async def search_bizcontacts_data_from_DB(order_id:int, db: AsyncSession):
     bizcontacts_query = await db.execute(select(BizContacts).where(BizContacts.order_id == order_id))
     bizcontacts = bizcontacts_query.scalar_one_or_none()

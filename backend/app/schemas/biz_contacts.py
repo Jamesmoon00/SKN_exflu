@@ -28,3 +28,13 @@ class BizContactsDataResponse(BaseModel): # DB 호출
     service_target : Optional[str] = None
     service_charactors :Optional[str] = None
     category_id :int
+    
+class BizContactsUpdateModel(BaseModel):
+    service_name :Optional[str] = None
+    service_info : Optional[str] = None
+    budget :Optional[str] = None
+    period : Optional[str] = None
+    platform :Optional[str] = None
+    promo_info : Optional[str] = None
+    service_target : Optional[str] = None
+    service_charactors :Optional[str] = None
