@@ -9,15 +9,15 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# pip 업그레이드 추가
-RUN pip install --upgrade pip
-    
 # 코드 복사 
 COPY ./openai_chatbot /app
 COPY ./requirements.txt /app
 
 # 실행 폴더 정의 
 WORKDIR /app
+
+# Set PYTHONPATH for project root
+ENV PYTHONPATH=/app
 
 # 필요한 라이브러리 설치  
 RUN pip3 install -r ./requirements.txt

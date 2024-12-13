@@ -1,4 +1,5 @@
 streamlit
+streamlit-extras
 openai
 langchain
 langchain_core
@@ -7,3 +8,4 @@ langchain-community
 langgraph
 boto3
 datetime
+pandas

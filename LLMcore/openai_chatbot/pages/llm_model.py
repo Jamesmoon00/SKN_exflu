@@ -3,10 +3,25 @@ from langchain_last_mini.prompt import create_message
 from langchain_last_mini.chat import response_from_langchain, response_from_runnable_lambda, response_from_runnable_parallel, response_from_langgraph
 import streamlit as st
 from langchain_last_mini.utils import init_chatbot
+from streamlit_extras.switch_page_button import switch_page
 
+# Page 2
+st.title("LLM Model")
+
+# 버튼 가로 배치
+col1, col2, _ = st.columns([1, 1, 3])  # 두 개의 열 생성
+
+with col1:
+    if st.button("Main Page"):
+        switch_page("main")
+
+with col2:
+    if st.button("DB Data Search"):
+        switch_page("DB_Data_Search")
+
+st.write("LLM model에 적절한 키워드를 입력하세요")
 init_chatbot()
 
-st.title("Chat Bot final mini")
 
 # ... existing code ...
 
