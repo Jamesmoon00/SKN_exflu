@@ -50,7 +50,7 @@ const ContactUs = () => {
                     onMouseLeave={() => setHoveredYes(false)} // 호버 상태 비활성화
                     onClick={handleYesClick}
                 >
-                    Yes
+                    견적 받기
                 </button>
                 <button
                     style={{
@@ -64,7 +64,7 @@ const ContactUs = () => {
                     onMouseLeave={() => setHoveredNo(false)} // 호버 상태 비활성화
                     onClick={handleNoClick}
                 >
-                    No
+                    결과 보기
                 </button>
             </div>
         </div>

@@ -63,62 +63,64 @@ const Blog = () => {
                 marginRight: isMobile ? "25px" : "45px",
             }}
         >
-            {showSideCard && <SideCard />}
+            {showSideCard && <SideCard style={styles.sideCard} />}
             <div
                 style={{
                     ...styles.blogList,
                     marginLeft: isMobile ? "20px" : "40px",
-                    marginRignt: isMobile ? "-25px" : "0px",
+                    marginRight: isMobile ? "-25px" : "0px",
                 }}
             >
-                <div style={styles.blogHeader}>
-                    <p style={styles.postCount}>✏️목록</p>
-                    <div style={styles.postHeader}>
-                        <span style={styles.postNum}>번호</span>
-                        <span style={styles.postTitle}>글 제목</span>
-                        <span style={styles.postDate}>작성일</span>
+                <div style={styles.post}>
+                    <div style={styles.blogHeader}>
+                        <p style={styles.postCount}>✏️목록</p>
+                        <div style={styles.postHeader}>
+                            <span style={styles.postNum}>번호</span>
+                            <span style={styles.postTitle}>글 제목</span>
+                            <span style={styles.postDate}>작성일</span>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    {paginatedPosts.length > 0 ? (
-                        paginatedPosts.map((post, index) => (
-                            <div
-                                key={post.post_id}
-                                style={{ ...styles.postItem, cursor: "pointer" }}
-                                onClick={() => navigate(`/blog/${post.post_id}`)}
-                            >
-                                <span style={styles.postNum}>
-                                    {index + 1 + (currentPage - 1) * pageSize}
-                                </span>
-                                <span style={styles.postTitle}>{post.title}</span>
-                                <span style={styles.postDate}>
-                                    {post.created_at.split("T")[0]}
-                                </span>
-                            </div>
-                        ))
-                    ) : (
-                        <p style={{ textAlign: "center" }}>게시글이 없습니다.</p>
-                    )}
-                </div>
-                {/* 페이지네이션 */}
-                <div style={styles.pagination}>
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        style={styles.pageButton}
-                    >
-                        이전
-                    </button>
-                    <span>
-                        {currentPage} / {totalPages}
-                    </span>
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        style={styles.pageButton}
-                    >
-                        다음
-                    </button>
+                    <div>
+                        {paginatedPosts.length > 0 ? (
+                            paginatedPosts.map((post, index) => (
+                                <div
+                                    key={post.post_id}
+                                    style={{ ...styles.postItem, cursor: "pointer" }}
+                                    onClick={() => navigate(`/blog/${post.post_id}`)}
+                                >
+                                    <span style={styles.postNum}>
+                                        {index + 1 + (currentPage - 1) * pageSize}
+                                    </span>
+                                    <span style={styles.postTitle}>{post.title}</span>
+                                    <span style={styles.postDate}>
+                                        {post.created_at.split("T")[0]}
+                                    </span>
+                                </div>
+                            ))
+                        ) : (
+                            <p style={{ textAlign: "center" }}>게시글이 없습니다.</p>
+                        )}
+                    </div>
+                    {/* 페이지네이션 */}
+                    <div style={styles.pagination}>
+                        <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            style={styles.pageButton}
+                        >
+                            이전
+                        </button>
+                        <span>
+                            {currentPage} / {totalPages}
+                        </span>
+                        <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            style={styles.pageButton}
+                        >
+                            다음
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -131,13 +133,23 @@ const styles = {
         marginLeft: "45px",
         marginRight: "45px",
         backgroundColor: "#fffaea",
-        height: "100vh",
+        minHeight: "100vh",
+    },
+    sideCard: {
+        flex: "1",
+        minHeight: "100vh",
+    },
+    post: {
+     
+        borderRadius: "10px",
+       
+        overflow: "auto",
+   
     },
     blogList: {
-        flex: "2.5",
-        marginLeft: "40px",
-        width: "100%",
-        marginTop: "20px",
+        flex: "3",
+        marginTop: "30px",
+        marginBottom: "30px",
     },
     blogHeader: {
         borderBottom: "2px solid #F1D1A3",
@@ -176,12 +188,12 @@ const styles = {
     },
     pagination: {
         display: "flex",
-        justifyContent: "center", // 가로 중앙 정렬
-        alignItems: "center", // 세로 중앙 정렬
-        padding: "60px 70px 0px",
-        
-        marginTop: "auto",
-        gap: "10px", // 버튼 간격
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "60px 70px ",
+        marginTop: "60px",
+        gap: "10px",
+        marginBottom: "0px"
     },
     pageButton: {
         padding: "5px 10px",
