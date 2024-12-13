@@ -3,7 +3,6 @@ from typing import Literal, List
 from datetime import datetime
 
 class BizContactsDataRequests(BaseModel): # DB 저장
-    biz_key :int
     order_date : datetime
     service_name :str
     service_info :str
@@ -18,7 +17,6 @@ class BizContactsDataRequests(BaseModel): # DB 저장
     
 class BizContactsDataResponce(BaseModel): # DB 호출
     order_id :int
-    biz_key :int
     order_date : datetime
     service_name :str
     service_info :str
