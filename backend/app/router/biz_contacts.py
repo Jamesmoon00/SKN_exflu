@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.biz_contacts import BizContactsDataRequests, BizContactsDataResponce
+from app.schemas.biz_contacts import BizContactsDataRequests, BizContactsDataResponse
 from app.services.biz_contacts_service import insert_bizcontacts_data_to_DB, search_bizcontacts_data_from_DB, delete_bizcontacts_data_from_DB, search_bizcontacts_data_from_DB_as_uuid, delete_bizcontacts_data_from_DB_as_uuid
 from app.database.database import get_db
 from app.auth.token import get_current_user  # 인증 함수
@@ -18,7 +18,7 @@ async def insert_bizcontacts(bizinfo_data: BizContactsDataRequests, db: AsyncSes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/uuid/{uuid}", summary="기업 광고 정보 검색", status_code=status.HTTP_201_CREATED, response_model=BizContactsDataResponce)
+@router.get("/uuid/{uuid}", summary="기업 광고 정보 검색", status_code=status.HTTP_201_CREATED, response_model=BizContactsDataResponse)
 async def search_bizcontacts(uuid: str, db: AsyncSession = Depends(get_db)):#, current_user: dict = Depends(get_current_user)): # 인증 종속성 추가
     try:
         result = await search_bizcontacts_data_from_DB_as_uuid(uuid, db)  # 서비스 로직 호출
@@ -34,7 +34,7 @@ async def delete_bizcontacts(uuid:str, db: AsyncSession = Depends(get_db)):#, cu
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/order_id/{order_id}", summary="기업 광고 정보 검색", status_code=status.HTTP_201_CREATED, response_model=BizContactsDataResponce)
+@router.get("/order_id/{order_id}", summary="기업 광고 정보 검색", status_code=status.HTTP_201_CREATED, response_model=BizContactsDataResponse)
 async def search_bizcontacts(order_id: int, db: AsyncSession = Depends(get_db)):#, current_user: dict = Depends(get_current_user)): # 인증 종속성 추가
     try:
         result = await search_bizcontacts_data_from_DB(order_id, db)  # 서비스 로직 호출
