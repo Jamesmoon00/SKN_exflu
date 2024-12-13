@@ -49,7 +49,7 @@ class BizContacts(Base):
     service_target = Column(String(45))
     service_charactors = Column(String(45))
     category_id = Column(Integer, ForeignKey("ProductCategories.category_id"), default = 999)
-    UUID = Column(String(100), ForeignKey("biz_info.UUID"))
+    UUID = Column(String(36), ForeignKey("biz_info.UUID"))
 
 # blogpost 간편 버전
 class BlogPostSimple(Base):

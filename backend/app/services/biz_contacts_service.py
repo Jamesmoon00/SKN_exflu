@@ -75,7 +75,7 @@ async def delete_bizcontacts_data_from_DB_as_uuid(uuid:str, db: AsyncSession):
     if not bizinfo:
         raise HTTPException(status_code=404, detail="Biz info not found")
     try:
-        db.delete(bizinfo)
+        await db.delete(bizinfo)
         await db.commit()
         return {"Message": "Bizinfo Deletion Complete"}
     except:
@@ -111,7 +111,7 @@ async def delete_bizcontacts_data_from_DB(order_id:int, db: AsyncSession):
     if not bizinfo:
         raise HTTPException(status_code=404, detail="Biz info not found")
     try:
-        db.delete(bizinfo)
+        await db.delete(bizinfo)
         await db.commit()
         return {"Message": "Bizinfo Deletion Complete"}
     except:
