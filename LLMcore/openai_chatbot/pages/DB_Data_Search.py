@@ -42,7 +42,7 @@ if st.button("전송", key="test_butten"):
         st.error(f"요청 실패: {e}")
 
 # FastAPI 엔드포인트 URL
-POST_DELETE_BASE_URL = "http://backdocsend.jamesmoon.click/bizcontacts"  # FastAPI의 기본 URL
+POST_DELETE_BASE_URL = "https://backdocsend.jamesmoon.click/bizcontacts"  # FastAPI의 기본 URL
 
 # Streamlit 타이틀 설정
 st.title("BizContacts 정보 조회 및 관리")
@@ -134,7 +134,7 @@ elif option == "데이터 삭제: Order ID":
 
 
 # FastAPI 서버 URL
-PUT_BASE_URL = "http://backdocsend.jamesmoon.click/"  # FastAPI 서버의 기본 URL
+PUT_BASE_URL = "https://backdocsend.jamesmoon.click"  # FastAPI 서버의 기본 URL
 
 # UUID 입력받기
 st.title("Biz Contacts Update")
@@ -172,20 +172,23 @@ if submitted:
     # None 값을 제거하여 FastAPI에 필요한 데이터만 전송
     update_data = {k: v for k, v in update_data.items() if v is not None}
 
-    if uuid:
-        # FastAPI로 업데이트 요청 보내기
-        try:
-            response = requests.put(f"{PUT_BASE_URL}/bizcontacts/{uuid}", json=update_data)
-            if response.status_code == 200:
-                st.success("Record updated successfully!")
-                st.json(response.json())  # 응답 데이터를 JSON 형식으로 출력
-            else:
-                st.error(f"Failed to update record: {response.status_code}")
-                st.json(response.json())
-        except requests.exceptions.RequestException as e:
-            st.error(f"Error: {e}")
+    if update_data:
+        if uuid:
+            # FastAPI로 업데이트 요청 보내기
+            try:
+                response = requests.put(f"{PUT_BASE_URL}/bizcontacts/{uuid}", json=update_data)
+                if response.status_code == 200:
+                    st.success("Record updated successfully!")
+                    st.json(response.json())  # 응답 데이터를 JSON 형식으로 출력
+                else:
+                    st.error(f"Failed to update record: {response.status_code}")
+                    st.json(response.json())
+            except requests.exceptions.RequestException as e:
+                st.error(f"Error: {e}")
+        else:
+            st.error("Please enter a valid UUID.")
     else:
-        st.error("Please enter a valid UUID.")
+        st.error("No data to update. Please fill at least one field.")
 
 
 # st.title("Product Category Viewer")
