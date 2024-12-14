@@ -40,7 +40,8 @@ if st.button("전송", key="test_butten"):
             st.error(f"에러: {response.status_code} - {response.json()}")
     except requests.exceptions.RequestException as e:
         st.error(f"요청 실패: {e}")
-
+        
+        
 # FastAPI 엔드포인트 URL
 POST_DELETE_BASE_URL = "https://backdocsend.jamesmoon.click/bizcontacts"  # FastAPI의 기본 URL
 
@@ -50,6 +51,9 @@ st.title("BizContacts 정보 조회 및 관리")
 # 선택 메뉴
 option = st.selectbox("옵션 선택", ["조회: UUID", "조회: Order ID", "데이터 삭제: UUID", "데이터 삭제: Order ID"])
 
+# 상태 관리를 위한 초기화
+if "query_result" not in st.session_state:
+    st.session_state.query_result = None  # 조회 결과 초기화
 
 # null 값을 처리하는 헬퍼 함수
 def sanitize_response(data):
@@ -68,14 +72,19 @@ if option == "조회: UUID":
                     # 응답 데이터를 처리
                     result = response.json()
                     sanitized_result = sanitize_response(result)
+                    st.session_state.query_result = sanitized_result  # 상태에 저장
                     st.success("조회 성공")
-                    st.json(sanitized_result)  # JSON 형식으로 출력
                 else:
                     st.error(f"조회 실패: {response.status_code} - {response.text}")
             except requests.exceptions.RequestException as e:
                 st.error(f"요청 실패: {e}")
         else:
             st.warning("UUID를 입력해주세요.")
+
+    # 조회 결과 출력
+    if st.session_state.query_result:
+        st.write("조회 결과:")
+        st.json(st.session_state.query_result)
 
 elif option == "조회: Order ID":
     # Order ID로 데이터 조회
@@ -88,17 +97,19 @@ elif option == "조회: Order ID":
                     # 응답 데이터를 처리
                     result = response.json()
                     sanitized_result = sanitize_response(result)
+                    st.session_state.query_result = sanitized_result  # 상태에 저장
                     st.success("조회 성공")
-                    
-                    # DataFrame으로 변환하여 테이블 형식으로 출력
-                    st.write("조회 결과:")
-                    st.table(pd.DataFrame([sanitized_result]))
                 else:
                     st.error(f"조회 실패: {response.status_code} - {response.text}")
             except requests.exceptions.RequestException as e:
                 st.error(f"요청 실패: {e}")
         else:
             st.warning("Order ID를 입력해주세요.")
+
+    # 조회 결과 출력
+    if st.session_state.query_result:
+        st.write("조회 결과:")
+        st.table(pd.DataFrame([st.session_state.query_result]))
 
 elif option == "데이터 삭제: UUID":
     # UUID로 데이터 삭제
@@ -109,6 +120,7 @@ elif option == "데이터 삭제: UUID":
                 response = requests.delete(f"{POST_DELETE_BASE_URL}/uuid/{uuid}")
                 if response.status_code == 201:
                     st.success("데이터 삭제 성공")
+                    st.session_state.query_result = None  # 상태 초기화
                 else:
                     st.error(f"삭제 실패: {response.status_code} - {response.text}")
             except requests.exceptions.RequestException as e:
@@ -125,6 +137,7 @@ elif option == "데이터 삭제: Order ID":
                 response = requests.delete(f"{POST_DELETE_BASE_URL}/order_id/{order_id}")
                 if response.status_code == 201:
                     st.success("데이터 삭제 성공")
+                    st.session_state.query_result = None  # 상태 초기화
                 else:
                     st.error(f"삭제 실패: {response.status_code} - {response.text}")
             except requests.exceptions.RequestException as e:
