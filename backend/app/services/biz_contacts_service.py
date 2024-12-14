@@ -144,6 +144,7 @@ async def search_bizcontacts_data_from_DB(order_id:int, db: AsyncSession):
         service_target=bizcontacts.service_target,
         service_charactors=bizcontacts.service_charactors,
         category_id=bizcontacts.category_id,
+        UUID = bizcontacts.UUID,
     )
 
 async def delete_bizcontacts_data_from_DB(order_id:int, db: AsyncSession):
