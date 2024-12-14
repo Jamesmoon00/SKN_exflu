@@ -28,6 +28,7 @@ class BizContactsDataResponse(BaseModel): # DB 호출
     service_target : Optional[str] = None
     service_charactors :Optional[str] = None
     category_id :int
+    UUID : str
     
 class BizContactsUpdateModel(BaseModel):
     service_name :Optional[str] = None
