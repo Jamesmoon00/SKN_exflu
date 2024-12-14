@@ -19,7 +19,7 @@ async def insert_bizcontacts(bizinfo_data: BizContactsDataRequests, db: AsyncSes
         raise HTTPException(status_code=500, detail=str(e))
 
 # uuid 수정
-@router.put("/bizcontacts/{uuid}")
+@router.put("/{uuid}")
 async def update_bizcontacts(uuid: str, update_data: BizContactsUpdateModel, db: AsyncSession = Depends(get_db),):
     updated_data = await update_bizcontacts_data_as_uuid(uuid, db, update_data.dict(exclude_unset=True))
     return {"Message": "Bizinfo Updated Successfully", "Updated Data": updated_data}
