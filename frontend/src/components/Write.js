@@ -257,7 +257,7 @@ const styles = {
         display: "flex",
         marginLeft: "45px",
         marginRight: "45px",
-        backgroundColor: "#fffaea",
+   
         minHeight: "100vh",
     },
     sideCard: {
@@ -307,10 +307,7 @@ const styles = {
     },
     image: {
         display: "flex",
-        boxShadow: `
-        0px 2px 15px rgba(212, 165, 98, 0.2), 
-        0px 4px 30px rgba(212, 165, 98, 0.1)
-        `,
+        
         width: "60%"
     },
     contentbox: {

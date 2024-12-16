@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link,Navigate, BrowserRouter} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route,Navigate } from "react-router-dom";
 import TopNav from "./components/TopNav";
 import Home from "./pages/Home"
 import Profile from "./pages/Profile"
@@ -16,10 +16,7 @@ const isAuthenticated = () => {
   return !!localStorage.getItem("authToken"); // 예: 토큰 저장 여부 확인
 };
 
-// PublicRoute: 로그인 없이 접근 가능
-const PublicRoute = ({ children }) => {
-  return children;
-};
+
 
 // PrivateRoute: 로그인 필요
 const PrivateRoute = ({ children }) => {
@@ -73,7 +70,7 @@ const styles = {
   container: {
     display: "flex",
     flexDirection: "column",
-    backgroundColor: "#fffaea",
+    background: "linear-gradient(0deg, #FFEFB8 0%, #FFFAEA 25%)",
     overflowX: "hidden", // 가로 스크롤 방지
   },
   

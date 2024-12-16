@@ -6,12 +6,13 @@ import techEddy from "../assets/img/techEddy.png";
 
 const Profile = () => {
     const [showSideCard, setShowSideCard] = useState(true);
-    
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
    
     useEffect(() => {
         const handleResize = () => {
             setShowSideCard(window.innerWidth > 1000);
-            
+            setIsMobile(window.innerWidth <= 768);
         };
 
         handleResize();
@@ -31,7 +32,9 @@ const Profile = () => {
             {showSideCard && <ProfileSideCard />}
 
             <div style={styles.Profile}>
-                <div style={styles.card}>
+                <div style={{...styles.card,
+                    flexDirection : isMobile ? "column" : "row"
+                }}>
                     <img src={dailyEddy1} alt="" style={styles.dailyimage} />
                     <div style={styles.textContainer}>
                         <div style={styles.title}>🌳에디의 즐거운 일상🌳</div>
@@ -52,7 +55,8 @@ const Profile = () => {
                     style={{
                         ...styles.card,
                         justifyContent: "flex-end", // 이미지와 텍스트 순서 반대
-                        background: "linear-gradient(270deg, #FFEFB8 0%, #FFFDF7 85%)"
+                        background: "linear-gradient(270deg, #FFEFB8 0%, #FFFDF7 85%)",
+                        flexDirection : isMobile ? "column" : "row"
                     }}
                 >
                     <div style={styles.textContainerRight}>
@@ -77,7 +81,7 @@ const styles = {
         display: "flex",
         marginLeft: "45px",
         marginRight: "40px",
-        backgroundColor: "#fffaea",
+       
         // minHeight: "100vh",
         justifyContent: "space-between",
     },

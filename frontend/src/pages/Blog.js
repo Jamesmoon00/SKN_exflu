@@ -132,7 +132,7 @@ const styles = {
         display: "flex",
         marginLeft: "45px",
         marginRight: "45px",
-        backgroundColor: "#fffaea",
+      
         // minHeight: "100vh",
         flexDirection: "row",
         justifyContent: "flex-start",

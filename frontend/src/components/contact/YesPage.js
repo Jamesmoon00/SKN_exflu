@@ -57,7 +57,7 @@ const YesPage = () => {
                     },
                 }
             );
-            alert("데이터 전송 성공");
+            
             console.log("Response:", response.data);
             navigate("/solution", {state: response.data}); // '/solution'은 Solution.js가 연결된 라우트 경로
             
@@ -296,7 +296,7 @@ const styles = {
         display: "flex",
         marginLeft: "45px",
         marginRight: "40px",
-        backgroundColor: "#fffaea",
+      
         minHeight: "100vh",
         justifyContent: "space-between", // 좌우 요소 간 여백 균일화
     },

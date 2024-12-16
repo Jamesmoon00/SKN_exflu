@@ -145,7 +145,7 @@ const styles = {
         flexDirection: "column",
         marginLeft: "45px",
         marginRight: "45px",
-        backgroundColor: "#fffaea",
+  
         minHeight: "100vh",
     },
     reportTitle: {

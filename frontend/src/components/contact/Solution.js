@@ -6,9 +6,20 @@ import ReactMarkdown from "react-markdown"; // react-markdown import
 
 const Solution = () => {
     const location = useLocation();
-    const { Message, biz_name, ad_outline } = location.state || {}; // 전달된 데이터
+    const { biz_name, ad_outline } = location.state || {}; // 전달된 데이터
     const [showSideCard, setShowSideCard] = useState(true);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setShowSideCard(window.innerWidth > 1000);
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
     return (
         <div
             style={{
@@ -54,7 +65,7 @@ const styles =  {
         display: "flex",
         marginLeft: "45px",
         marginRight: "40px",
-        backgroundColor: "#fffaea",
+        
         minHeight: "100vh",
         justifyContent: "space-between", // 좌우 요소 간 여백 균일화
     },
