@@ -10,6 +10,9 @@ import SideCard from "./board/SideCard";
 import CommentList from "./board/CommentList";
 import CommentForm from "./board/CommentForm";
 import Loading from "./contact/components/Loading";
+import ReactMarkdown from "react-markdown"; // react-markdown import
+
+
 const Write = () => {
     const { id } = useParams(); // URL에서 게시글 ID 가져오기
     const [likes, setLikes]=useState(0);
@@ -69,9 +72,13 @@ const Write = () => {
             
             if (response.status === 200) {
                 // 삭제 성공 시 로컬 상태에서 댓글 삭제
+                // 삭제 성공 시 로컬 상태에서 댓글 삭제
                 setComments((prevComments) =>
-                    prevComments.filter((comment) => comment.password !==inputPassword)
+                    prevComments.filter((comment) => 
+                        !(comment.writer === inputWriter && comment.id === post_id)
+                    )
                 );
+               
                 alert("댓글이 삭제되었습니다.");
             } else {
                 alert("비밀번호가 일치하지 않습니다.");
@@ -182,9 +189,9 @@ const Write = () => {
     
                 <div style={{ ...styles.contentbox, marginTop: isMobile ? "5px" : "20px" }}>
                     {post ? (
-                        <p style={{ ...styles.content, fontSize: isMobile ? "0.9rem" : "1.1rem" }}>
+                        <ReactMarkdown style={{ ...styles.content, fontSize: isMobile ? "0.9rem" : "1.1rem" }}>
                             {post.content}
-                        </p>
+                        </ReactMarkdown>
                     ) : (
                         <div
                             style={{
