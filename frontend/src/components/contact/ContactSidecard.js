@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import profileImage from "../../assets/img/eddy_contactYes.png";
 
 const SideCard = () => {

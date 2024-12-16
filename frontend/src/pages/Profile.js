@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import ProfileSideCard from "../components/profile/ProfileSideCard";
 import "@fontsource/lexend-deca"; // npm에서 제공하는 경우
 import dailyEddy1 from "../assets/img/dailyEddy1.png";
@@ -7,12 +6,12 @@ import techEddy from "../assets/img/techEddy.png";
 
 const Profile = () => {
     const [showSideCard, setShowSideCard] = useState(true);
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    
    
     useEffect(() => {
         const handleResize = () => {
             setShowSideCard(window.innerWidth > 1000);
-            setIsMobile(window.innerWidth <= 768);
+            
         };
 
         handleResize();
@@ -53,6 +52,7 @@ const Profile = () => {
                     style={{
                         ...styles.card,
                         justifyContent: "flex-end", // 이미지와 텍스트 순서 반대
+                        background: "linear-gradient(270deg, #FFEFB8 0%, #FFFDF7 85%)"
                     }}
                 >
                     <div style={styles.textContainerRight}>
@@ -78,7 +78,7 @@ const styles = {
         marginLeft: "45px",
         marginRight: "40px",
         backgroundColor: "#fffaea",
-        minHeight: "100vh",
+        // minHeight: "100vh",
         justifyContent: "space-between",
     },
     Profile: {
@@ -88,19 +88,19 @@ const styles = {
         overflow: "auto",
     },
     card: {
-        background: "#FFFDF7",
         borderRadius: "10px",
         marginBottom: "30px",
-        height: "40%",
-        boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        height: "auto",
+        boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",
         display: "flex",
         justifyContent: "flex-start",
         alignItems: "center",
         padding: "10px",
+        background: "linear-gradient(90deg, #FFEFB8 0%, #FFFDF7 85%)"
     },
     dailyimage: {
-        width: "20%",
-        height: "80%",
+        width: "240px",
+        height: "240px",
         borderRadius: "100px",
         margin: "30px",
     },

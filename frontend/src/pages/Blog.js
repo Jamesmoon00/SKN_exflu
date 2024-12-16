@@ -16,13 +16,13 @@ const Blog = () => {
         const fetchPosts = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}blog/`); // 서버 API URL
-               // 최신글 순으로 정렬
-               const sortedPosts = response.data.sort(
+                // 최신글 순으로 정렬
+                const sortedPosts = response.data.sort(
                     (a, b) => new Date(b.created_at) - new Date(a.created_at)
                 );
 
-            setPosts(sortedPosts); // 정렬된 데이터 상태에 저장
-            console.log(sortedPosts);
+                setPosts(sortedPosts); // 정렬된 데이터 상태에 저장
+                console.log(sortedPosts);
             } catch (error) {
                 console.error("데이터를 가져오는 중 오류 발생:", error);
             }
@@ -71,7 +71,7 @@ const Blog = () => {
                     marginRight: isMobile ? "-25px" : "0px",
                 }}
             >
-                <div style={styles.post}>
+             
                     <div style={styles.blogHeader}>
                         <p style={styles.postCount}>✏️목록</p>
                         <div style={styles.postHeader}>
@@ -121,7 +121,7 @@ const Blog = () => {
                             다음
                         </button>
                     </div>
-                </div>
+                
             </div>
         </div>
     );
@@ -133,23 +133,25 @@ const styles = {
         marginLeft: "45px",
         marginRight: "45px",
         backgroundColor: "#fffaea",
-        minHeight: "100vh",
+        // minHeight: "100vh",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        height: "100%", // 부모 컨테이너 높이 맞추기
     },
     sideCard: {
         flex: "1",
+        height: "100%",  // 사이드 카드 높이 맞추기
         minHeight: "100vh",
-    },
-    post: {
-     
-        borderRadius: "10px",
-       
-        overflow: "auto",
-   
     },
     blogList: {
         flex: "3",
         marginTop: "30px",
         marginBottom: "30px",
+        height: "100%",  // 블로그 리스트 높이 맞추기
+    },
+    post: {
+        borderRadius: "10px",
+        overflow: "auto",
     },
     blogHeader: {
         borderBottom: "2px solid #F1D1A3",
@@ -190,7 +192,7 @@ const styles = {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        padding: "60px 70px ",
+        padding: "60px 0px 0px",
         marginTop: "60px",
         gap: "10px",
         marginBottom: "0px"
