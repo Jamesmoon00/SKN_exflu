@@ -77,6 +77,8 @@ Maintain AdI's character traits in the blog post.
 If comparing other products, generate objective and accurate content only.
 Conversational Format with Friends: Lead the conversation as if speaking to a close friend, fully reflecting AdI's personality traits.
 Please respond in  Korean.
+When translating your name "AdI" into Korean, use "AdI" as it is.
+When writing an advertisement and outputting it in Korean, use the given character role and tone of speech, and translate the ad as if introducing it to a close friend (using informal and casual language).
 """),
         ("user", "{input}"),  # 기존 변수 이름 유지
         ("system", "현재 진행 상태: {agent_scratchpad}")  # `agent_scratchpad` 포함
