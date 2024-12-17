@@ -22,7 +22,10 @@ with col2:
         switch_page("DB_Data_Search")
 
 st.write("LLM model에 적절한 키워드를 입력하세요")
-init_chatbot()
+
+# 로딩 스피너 표시
+with st.spinner("페이지를 로드하는 중입니다..."):
+    init_chatbot()  # 챗봇 초기화 작업
 
 # 메세지를 저장 
 # messages = {"role":"", "content":""}

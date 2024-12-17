@@ -2,7 +2,7 @@ import os
 import boto3
 import streamlit as st
 
-@st.cache_data # 데이터를 caching 처리 
+@st.cache_data(show_spinner=False) # 데이터를 caching 처리 
 def __set_openai_api_key():
   OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', None)
   TAVILY_API_KEY = os.environ.get('TAVILY_API_KEY', None)
