@@ -11,7 +11,7 @@ class User(Base):
     name = Column(String, nullable=True)
     phone = Column(String, nullable=True)
     kakao_id = Column(String, unique=True, index=True, nullable=True)  # Kakao 고유 ID 추가
-    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    created_at = Column(DateTime, default=lambda: datetime.now() + timedelta(hours=9))
     refresh_token = Column(String, nullable=True)  # Refresh Token 저장
 
 
@@ -39,7 +39,7 @@ class BizContacts(Base):
     __tablename__ = "biz_contacts"
     
     order_id = Column(Integer, primary_key=True, index = True)
-    order_date = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    order_date = Column(DateTime, default=lambda: datetime.now() + timedelta(hours=9))
     service_name = Column(String(50))
     service_info = Column(String(255))
     budget = Column(Integer)
@@ -57,7 +57,7 @@ class BlogPostSimple(Base):
 
     post_id = Column(Integer, primary_key=True, index=True)  # 블로그 ID
     title = Column(String(255), nullable=False)  # 블로그 제목
-    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    created_at = Column(DateTime, default=lambda: datetime.now() + timedelta(hours=9))
     views = Column(Integer, default=0)
     likes = Column(Integer, default=0)
     is_ad = Column(Boolean, default=False)  # 광고 여부
@@ -78,7 +78,7 @@ class BlogCommentSimple(Base):
     comment_name = Column(String(50), nullable=False)
     comment_password = Column(String(50), nullable=False)
     comment_content = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    created_at = Column(DateTime, default=lambda: datetime.now() + timedelta(hours=9))
     
     # BlogPost 관계 설정
     blog_post = relationship("BlogPostSimple", back_populates="comments")
@@ -135,7 +135,7 @@ class SNSPost(Base):
 
     post_id = Column(Integer, primary_key=True, index=True)  # SNS ID
     title = Column(String(255), nullable=False)  # SNS 제목
-    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    created_at = Column(DateTime, default=lambda: datetime.now() + timedelta(hours=9))
     views = Column(Integer, default=0)
     likes = Column(Integer, default=0)
     is_ad = Column(Boolean, default=False)  # 광고 여부
@@ -168,7 +168,7 @@ class SNSComment(Base):
     comment_name = Column(String(50), nullable=False)
     comment_password = Column(String(50), nullable=False)
     comment_content = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now() + timedelta(hours=9))
+    created_at = Column(DateTime, default=lambda: datetime.now() + timedelta(hours=9))
     # SNSPost 관계 설정
     sns_post = relationship("SNSPost", back_populates="comments")
 
