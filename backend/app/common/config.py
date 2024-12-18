@@ -53,6 +53,8 @@ kakao_pwd = get_parameter("/MYAPP/KAKAO/AUTH/PWD")
 kakao_redirect_url = "http://127.0.0.1:8000/auth/kakao/callback"
 #"https://backdocsend.jamesmoon.click/auth/kakao/callback"
 
+OLLAMA_API_URL = get_parameter("/MYAPP/sLLM/BASE")
+
 # S3 클라이언트 생성
 s3_client = boto3.client(
     "s3",
