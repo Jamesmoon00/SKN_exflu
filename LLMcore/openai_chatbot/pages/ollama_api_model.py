@@ -32,7 +32,7 @@ with col3:
 st.write("LLM model에 적절한 키워드를 입력하세요")
 
 # FastAPI 서버 URL
-FASTAPI_URL = "http://127.0.0.1:8000/ollama/generate"
+FASTAPI_URL = "http://backdocsend.jamesmoon.click/ollama/generate"
 
 # Streamlit UI 초기 설정
 st.title("🦊 LLM 챗봇")
