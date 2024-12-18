@@ -1,9 +1,9 @@
 import streamlit as st
 from openai import OpenAI # API 통신용 모듈 
-from langchain_ollama_api.langgraph.graph import set_workflow_to_app
-from langchain_ollama_api.chain import make_chain, runnable_parallel_chain, runnable_lambda_chain
-from langchain_ollama_api.langgraph.tools import get_langgraph_tools
-from langchain_ollama_api.langgraph.agent import create_openai_langgraph_agent
+from langchain_exaone_api.langgraph.graph import set_workflow_to_app
+from langchain_exaone_api.chain import make_chain, runnable_parallel_chain, runnable_lambda_chain
+from langchain_exaone_api.langgraph.tools import get_langgraph_tools
+from langchain_exaone_api.langgraph.agent import create_openai_langgraph_agent
 import time
 
 # # @st.cache_data # 데이터를 caching 처리 

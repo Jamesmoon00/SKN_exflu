@@ -3,7 +3,7 @@ from langchain.tools import BaseTool, StructuredTool, Tool, tool
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain import hub
 from langchain.agents import create_openai_functions_agent, AgentExecutor
-from langchain_ollama_api.model import creat_chat_model
+from langchain_exaone_api.model import creat_chat_model
 
 import random
 

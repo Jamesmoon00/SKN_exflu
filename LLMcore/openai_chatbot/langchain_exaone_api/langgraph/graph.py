@@ -1,7 +1,7 @@
 ##      Define the graph
 from langgraph.graph import END, StateGraph
-from langchain_ollama_api.langgraph.state import AgentState
-from langchain_ollama_api.langgraph.nodes import run_agent, execute_tools, should_continue, call_model, go_web_search, is_response_adequate
+from langchain_exaone_api.langgraph.state import AgentState
+from langchain_exaone_api.langgraph.nodes import run_agent, execute_tools, should_continue, call_model, go_web_search, is_response_adequate
 from langgraph.checkpoint.memory import MemorySaver
 
 # lang-graph structure

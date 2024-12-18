@@ -1,11 +1,11 @@
 import streamlit as st
 import requests
-from langchain_ollama_api.constant import CHATBOT_ROLE, CHATBOT_MESSAGE
-from langchain_ollama_api.prompt import create_message
-from langchain_ollama_api.chat import response_from_langgraph
-from langchain_ollama_api.utils import init_chatbot
-from langchain_ollama_api.ollama_api import fetch_ollama_response, create_ollama_prompt, get_langchain_tools
-from langchain_ollama_api.langgraph.agent import create_openai_langgraph_agent
+from langchain_exaone_api.constant import CHATBOT_ROLE, CHATBOT_MESSAGE
+from langchain_exaone_api.prompt import create_message
+from langchain_exaone_api.chat import response_from_langgraph
+from langchain_exaone_api.utils import init_chatbot
+from langchain_exaone_api.ollama_api import fetch_ollama_response, create_ollama_prompt, get_langchain_tools
+from langchain_exaone_api.langgraph.agent import create_openai_langgraph_agent
 from langchain.agents import initialize_agent, Tool
 from streamlit_extras.switch_page_button import switch_page
 from langchain.prompts import ChatPromptTemplate

@@ -1,4 +1,4 @@
-from langchain_ollama_api.constant import CHATBOT_MESSAGE, CHATBOT_ROLE
+from langchain_exaone_api.constant import CHATBOT_MESSAGE, CHATBOT_ROLE
 from langchain_core.prompts import PromptTemplate
 from langchain import hub
 from langchain_core.prompts import ChatPromptTemplate
