@@ -15,7 +15,7 @@ import httpx  # requests 대신 httpx 사용
 BACKEND_URL = "https://backdocsend.jamesmoon.click/blog/add"
 
 # 페이지 타이틀 및 버튼
-st.title("Ollama LLM Model")
+st.title("Exaone LLM Model")
 col1, col2, col3,_ = st.columns([1, 1, 1, 1])
 
 # 버튼으로 페이지 이동

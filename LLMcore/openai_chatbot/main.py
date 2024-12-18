@@ -23,5 +23,5 @@ with col2:
     if st.button("OpenAI LLM Model"):
         switch_page("openapi_model")
 with col3:
-    if st.button("Ollama LLM Model"):
-        switch_page("ollama_api_model")
+    if st.button("Exaone LLM Model"):
+        switch_page("exaone_model")

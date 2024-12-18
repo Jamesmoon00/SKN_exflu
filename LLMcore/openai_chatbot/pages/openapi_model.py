@@ -21,8 +21,8 @@ with col2:
     if st.button("DB Data Search"):
         switch_page("DB_Data_Search")
 with col3:
-    if st.button("Ollama LLM Model"):
-        switch_page("ollama_api_model")
+    if st.button("Exaone LLM Model"):
+        switch_page("exaone_model")
 
 st.write("LLM model에 적절한 키워드를 입력하세요")
 
