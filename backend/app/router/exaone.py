@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.ollama import PromptRequest
-from app.services.ollama_service import generate_ollama_exaone_service
+from SKN_exflu.backend.app.schemas.exaone import PromptRequest
+from SKN_exflu.backend.app.services.exaone_service import generate_ollama_exaone_service
 from app.database.database import get_db
 from fastapi.responses import StreamingResponse
 
-router = APIRouter(prefix="/ollama", tags=["Ollama"])
+router = APIRouter(prefix="/exaone", tags=["Ollama"])
 
 # 블로그 전체 조회
 @router.post("/generate", summary="Ollama 송수신")

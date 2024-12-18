@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from app.schemas.ollama import PromptRequest
+from SKN_exflu.backend.app.schemas.exaone import PromptRequest
 from app.common.config import OLLAMA_API_URL
 import requests
 import json
