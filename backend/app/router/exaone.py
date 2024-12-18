@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from SKN_exflu.backend.app.schemas.exaone import PromptRequest
-from SKN_exflu.backend.app.services.exaone_service import generate_ollama_exaone_service
+from app.schemas.exaone import PromptRequest
+from app.services.exaone_service import generate_ollama_exaone_service
 from app.database.database import get_db
 from fastapi.responses import StreamingResponse
 
