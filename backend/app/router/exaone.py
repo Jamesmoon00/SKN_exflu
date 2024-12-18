@@ -6,7 +6,7 @@ from app.services.exaone_service import generate_ollama_exaone_service
 from app.database.database import get_db
 from fastapi.responses import StreamingResponse
 
-router = APIRouter(prefix="/exaone", tags=["Ollama"])
+router = APIRouter(prefix="/exaone", tags=["exaone"])
 
 # 블로그 전체 조회
 @router.post("/generate", summary="Ollama 송수신")
