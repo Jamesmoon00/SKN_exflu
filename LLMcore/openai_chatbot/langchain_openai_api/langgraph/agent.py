@@ -1,7 +1,7 @@
 from langchain.agents import create_openai_functions_agent
-from langchain_last_mini.model import creat_chat_model
-from langchain_last_mini.langgraph.tools import get_langgraph_tools
-from langchain_last_mini.prompt import pull_langgraph_prompt, create_prompt
+from langchain_openai_api.model import creat_chat_model
+from langchain_openai_api.langgraph.tools import get_langgraph_tools
+from langchain_openai_api.prompt import pull_langgraph_prompt, create_prompt
 
 # agent_runnable
 def create_openai_langgraph_agent():

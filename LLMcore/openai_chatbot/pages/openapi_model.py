@@ -1,25 +1,28 @@
 import streamlit as st
 import requests
-from langchain_last_mini.constant import CHATBOT_ROLE, CHATBOT_MESSAGE
-from langchain_last_mini.prompt import create_message
-from langchain_last_mini.chat import response_from_langgraph
-from langchain_last_mini.utils import init_chatbot
+from langchain_openai_api.constant import CHATBOT_ROLE, CHATBOT_MESSAGE
+from langchain_openai_api.prompt import create_message
+from langchain_openai_api.chat import response_from_langgraph
+from langchain_openai_api.utils import init_chatbot
 from streamlit_extras.switch_page_button import switch_page
 
 # 백엔드 URL 설정
 BACKEND_URL = "https://backdocsend.jamesmoon.click/blog/add"
 
 # 페이지 타이틀 및 버튼
-st.title("LLM Model")
-col1, col2, _ = st.columns([1, 1, 3])
+st.title("OpenAI LLM Model")
+col1, col2, col3,_ = st.columns([1, 1, 1, 1])
 
+# 버튼으로 페이지 이동
 with col1:
     if st.button("Main Page"):
         switch_page("main")
-
 with col2:
     if st.button("DB Data Search"):
         switch_page("DB_Data_Search")
+with col3:
+    if st.button("Ollama LLM Model"):
+        switch_page("ollama_api_model")
 
 st.write("LLM model에 적절한 키워드를 입력하세요")
 

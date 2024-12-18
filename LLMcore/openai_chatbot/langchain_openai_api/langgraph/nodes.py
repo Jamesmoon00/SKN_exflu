@@ -1,13 +1,13 @@
 from langchain_core.agents import AgentFinish
 from langgraph.prebuilt.tool_executor import ToolExecutor
-from langchain_last_mini.langgraph.tools import get_langgraph_tools 
-from langchain_last_mini.langgraph.agent import create_openai_langgraph_agent
+from langchain_openai_api.langgraph.tools import get_langgraph_tools 
+from langchain_openai_api.langgraph.agent import create_openai_langgraph_agent
 from langchain_core.messages import trim_messages, SystemMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
-from langchain_last_mini.model import creat_chat_model
-from langchain_last_mini.langgraph.state import AgentState
-from langchain_last_mini.taviny.taviny import response_taviny_results
+from langchain_openai_api.model import creat_chat_model
+from langchain_openai_api.langgraph.state import AgentState
+from langchain_openai_api.taviny.taviny import response_taviny_results
 # 트리머 설정 함수
 def set_trimmer():
     return trim_messages(strategy="last", max_tokens=50, token_counter=len)

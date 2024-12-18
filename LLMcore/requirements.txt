@@ -9,3 +9,4 @@ langgraph
 boto3
 datetime
 pandas
+httpx

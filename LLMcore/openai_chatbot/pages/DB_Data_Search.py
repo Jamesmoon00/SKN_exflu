@@ -9,15 +9,20 @@ st.title("Connection_test")
 st.write("Welcome to Page 1! Use the buttons below to navigate.")
 
 # 버튼 가로 배치
-col1, col2, _ = st.columns([1, 1, 3])  # 두 개의 열 생성
+col1, col2, col3,_ = st.columns([1, 1, 1, 1])
 
+# 버튼으로 페이지 이동
 with col1:
     if st.button("Main Page"):
         switch_page("main")
-
 with col2:
-    if st.button("LLM Model"):
-        switch_page("llm_model")
+    if st.button("OpenAI LLM Model"):
+        switch_page("openapi_model")
+with col3:
+    if st.button("Ollama LLM Model"):
+        switch_page("ollama_api_model")
+
+
         
 # Streamlit 제목
 st.title("FastAPI와 Streamlit 간 송수신 테스트")
@@ -40,8 +45,6 @@ if st.button("전송", key="test_butten"):
             st.error(f"에러: {response.status_code} - {response.json()}")
     except requests.exceptions.RequestException as e:
         st.error(f"요청 실패: {e}")
-        
-        
 # FastAPI 엔드포인트 URL
 POST_DELETE_BASE_URL = "https://backdocsend.jamesmoon.click/bizcontacts"  # FastAPI의 기본 URL
 
@@ -184,6 +187,10 @@ if submitted:
 
     # None 값을 제거하여 FastAPI에 필요한 데이터만 전송
     update_data = {k: v for k, v in update_data.items() if v is not None}
+    
+    st.write("Update Data:", update_data)  # 디버깅용 출력
+    st.write("Request URL:", f"{PUT_BASE_URL}/bizcontacts/{uuid}")
+
 
     if update_data:
         if uuid:
