@@ -40,11 +40,18 @@
 - 대화 기록 관리
 - LangGraph를 활용한 대화 흐름 제어
 - 커스텀 체인 구현
+- Taviny 검색 엔진 통합
 
 ### 3. API 통합
 - FastAPI 백엔드 연동
 - RESTful API 엔드포인트 활용
 - 데이터 CRUD 작업 지원
+
+### 4. 보안 및 데이터 관리
+- UUID 기반 데이터 추적
+- 안전한 API 키 관리
+- 데이터 백업 및 복구
+- 사용자 세션 관리
 
 ## 기술 스택
 ### 프론트엔드 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)
@@ -73,23 +80,26 @@ LLMcore/
 │   │   ├── llm_model.py          # LLM 챗봇 인터페이스
 │   │   └── DB_Data_Search.py     # 데이터베이스 검색 인터페이스
 │   │
-│   ├── langchain_openai_api/      # LangChain 관련 모듈
+│   ├── langchain_openai_api/     # LangChain 관련 모듈
 │   │   ├── langgraph/
 │   │   │   ├── agent.py          # langgraph agent 설정
 │   │   │   ├── graph.py          # langgraph compile 로직 설정
 │   │   │   ├── nodes.py          # langgraph nodes 정의
 │   │   │   ├── state.py          # langgraph state 정의
-│   │   │   └── tools.py          # langgraph tools 정의의
+│   │   │   └── tools.py          # langgraph tools 정의
 │   │   └── taviny/
-│   │       └──taviny.py          # 검색 엔진 모듈듈
-│   │ 
+│   │       └── taviny.py         # 검색 엔진 모듈
+│   │
+│   ├── langchain_exaone_api/     # ExaOne API 통합 모듈
+│   │   └── [ExaOne 관련 파일들]
+│   │
 │   ├── chat.py                   # 챗봇 핵심 로직
 │   ├── chain.py                  # LangChain 체인 구현
 │   ├── constant.py               # 상수 정의
 │   ├── model.py                  # 모델 설정
 │   ├── prompt.py                 # 프롬프트 템플릿
 │   └── utils.py                  # 유틸리티 함수
-│ 
+│
 ├── dockerfile                    # Docker 컨테이너 설정
 ├── requirements.txt              # 프로젝트 의존성
 └── buildspec.yml                 # AWS 빌드 설정
@@ -125,6 +135,23 @@ docker build -t llmcore .
 ```bash
 docker run -p 8502:8502 llmcore
 ```
+
+## 환경 변수 설정
+프로젝트 실행을 위해 다음 환경 변수를 설정해야 합니다:
+
+```bash
+OPENAI_API_KEY=your_openai_api_key
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_DEFAULT_REGION=your_aws_region
+```
+
+## 시스템 요구사항
+- Python 3.10 이상
+- Docker 20.10.x 이상
+- 최소 4GB RAM
+- 인터넷 연결 필수
+- AWS 계정 (선택사항)
 
 ## API 엔드포인트
 - 기본 URL: `https://backdocsend.jamesmoon.click`
@@ -167,3 +194,26 @@ docker run -p 8502:8502 llmcore
 3. Commit your changes
 4. Push to the branch
 5. Create a new Pull Request
+
+## 문제 해결 가이드
+
+### 일반적인 문제
+1. 연결 오류
+   - API 키 확인
+   - 네트워크 연결 상태 확인
+   - 방화벽 설정 확인
+
+2. 성능 이슈
+   - 메모리 사용량 모니터링
+   - 캐시 정리
+   - 로그 확인
+
+3. Docker 관련 문제
+   - 컨테이너 로그 확인
+   - 포트 충돌 해결
+   - 이미지 재빌드
+
+## 업데이트 내역
+- 2023.12.18: ExaOne API 통합 모듈 추가
+- 2023.12.13: Docker 설정 업데이트
+- 2023.12.09: 초기 버전 릴리스
