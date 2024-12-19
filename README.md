@@ -184,7 +184,7 @@ pytest tests/
 - AWS CloudWatch 통합
 
 ## 👥 팀원 및 역할
-- Backend & 인프라:
-- Frontend:
-- AI & LLM:
-- DevOps:
+- Backend & 인프라: 김성은
+- Frontend: 구나연
+- AI & LLM: 문건우, 정재현
+- DevOps: 김성은, 문건우
