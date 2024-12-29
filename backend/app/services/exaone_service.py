@@ -11,7 +11,7 @@ def generate_ollama_exaone_service(payload: dict):
     try:
         response = requests.post(OLLAMA_API_URL, json=payload, stream=True)
         
-        if response.status_code != 200:
+        if 400 <= response.status_code < 600:
             yield json.dumps({"error": "Failed to fetch response from Ollama server"})
             return
         

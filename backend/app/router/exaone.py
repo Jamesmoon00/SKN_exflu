@@ -8,7 +8,6 @@ from fastapi.responses import StreamingResponse
 
 router = APIRouter(prefix="/exaone", tags=["exaone"])
 
-# 블로그 전체 조회
 @router.post("/generate", summary="Ollama 송수신")
 def generate_ollama_exaone(request: PromptRequest):
     """
