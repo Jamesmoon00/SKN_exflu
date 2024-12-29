@@ -10,6 +10,7 @@ from langchain.agents import initialize_agent, Tool
 from streamlit_extras.switch_page_button import switch_page
 from langchain.prompts import ChatPromptTemplate
 import httpx  # requests 대신 httpx 사용
+from langchain_exaone_api.prompt import sysprompt
 
 # 백엔드 URL 설정
 BACKEND_URL = "https://backdocsend.jamesmoon.click/blog/add"
@@ -57,7 +58,7 @@ if user_input:
         st.markdown(user_input)
     
     prompt_template = ChatPromptTemplate.from_messages([
-        ("system", "Your name is AdI. Answer user queries politely and concisely. Please respond in  Korean. When translating your name 'AdI' into Korean, use 'AdI' as it is."),
+        ("system", sysprompt),
         ("user", user_input),
     ])
     
