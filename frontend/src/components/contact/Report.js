@@ -20,12 +20,12 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, Title, LineElement, ArcElement, Tooltip, Legend);
 const Report = () => {
     const lineData = {
-        labels: ["7월", "8월", "9월", "10월", "11월", "12월"],
+        labels: ["2024년 11월", "2024년 12월", "2025년 1월"],
         datasets: [
             {
              
-                label: "매출 추이",
-                data: [70, 80, 90, 100, 110, 120],
+                label: "네이버 랭킹 변화",
+                data: [50, 22, 8],
                 borderColor: "#D98077",
                 borderWidth: 2,
                 tension: 0.4,
@@ -46,11 +46,11 @@ const Report = () => {
     console.log(barData);
     
     const tableData = [
-        { no: 1, content: "좋아요 1등 게시물", likes: 100, comments: 10 },
-        { no: 2, content: "좋아요 2등 게시물", likes: 90, comments: 10 },
-        { no: 3, content: "좋아요 3등 게시물", likes: 80, comments: 10 },
-        { no: 4, content: "좋아요 4등 게시물", likes: 70, comments: 10 },
-        { no: 5, content: "좋아요 5등 게시물", likes: 60, comments: 10 },
+        { no: 1, content: "[sk네트웍스 부트캠프] 소개글", likes: 97 , comments: 42 },
+        { no: 2, content: "[sk네트웍스 부트캠프] 2주차 강의 후기 (파이썬)", likes: 67, comments: 27 },
+        { no: 3, content: "[sk네트웍스 부트캠프] LLM 활용 서비스 제작", likes: 62, comments: 33 },
+        { no: 4, content: "[sk네트웍스 부트캠프] 데이터 분석 강의", likes: 55, comments: 8 },
+        { no: 5, content: "[sk네트웍스 부트캠프] 첫번째 미니프로젝트", likes: 41, comments: 12 },
     ];
 
     return (
@@ -67,10 +67,10 @@ const Report = () => {
                     <img src={campaign} alt="campaign" style={styles.overviewImg} />
                     <div style={styles.overviewDescription}>
                         <p style={styles.descriptionTitle}>🚀SK Network 부트캠프 홍보 마케팅🚀</p>
-                        <p style={styles.descriptionItem}>기간: xxxx.xx.xx ~ xxxx.xx.xx</p>
-                        <p style={styles.descriptionItem}>콘텐츠 등록 기간: xxxx.xx.xx ~ xxxx.xx.xx</p>
-                        <p style={styles.descriptionItem}>보고서 기준 날짜: xxxx.xx.xx</p>
-                        <p style={styles.descriptionItem}>설명: 홍보캠페인 설명부분입니다.</p>
+                        <p style={styles.descriptionItem}>기간: 2024.11.08-2025.01.02</p>
+                        <p style={styles.descriptionItem}>콘텐츠 등록 기간: 2024.12.04-2024.12.31</p>
+                        <p style={styles.descriptionItem}>보고서 기준 날짜: 2025.01.02</p>
+                        <p style={styles.descriptionItem}>설명: 인공지능 개발자를 양성하기 위한 프로그램인 sk networks 부트캠프에 대해 프로그램 소개글, 후기글을 작성하고 블로그에 업로드하여 홍보 캠페인 진행 </p>
                     </div>
                 </div>
             </div>
@@ -222,12 +222,13 @@ const styles = {
         display: "flex",
         gap: "30px", // 두 박스 간의 간격
         marginTop: "-20px",
-        marginLeft: "0px"
+        marginLeft: "0px",
+        width: "100%"
     },
     box: {
         flex: "1",
         height: "300px",
-        width: "100%",
+        width: "150%",
         backgroundColor: "#fffdf7",
         border: "2px solid #F5E4AE",
         borderRadius: "20px",

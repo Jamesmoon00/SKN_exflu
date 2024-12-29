@@ -160,7 +160,7 @@ const YesPage = () => {
                         />
                     </div>
                     <div style={styles.question}>
-                        <label style={styles.label}>Q3. 기업 주소를 입력해주세요.</label>
+                        <label style={styles.label}>Q3. 기업 홈페이지 주소를 입력해주세요.</label>
                         <input
                             type="address"
                             name="biz_address"

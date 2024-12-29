@@ -9,7 +9,7 @@ import YesorNo from "./components/contact/YesorNo"
 import Report from "./components/contact/Report"
 import Write from "./components/Write";
 import Solution from "./components/contact/Solution";
-
+import { RecoilRoot } from "recoil"; // RecoilRoot 추가
 // 각 페이지 컴포넌트
 // 로그인 여부를 관리하는 상태 예제
 const isAuthenticated = () => {
@@ -22,41 +22,44 @@ const isAuthenticated = () => {
 const PrivateRoute = ({ children }) => {
   return isAuthenticated() ? children : <Navigate to="/contact/result?response=no/report" replace />;
 };
+
 function App() {
   return (
-    <Router>
-      <div style={styles.container}>
-        {/* 네비게이션 바 */}
-        <TopNav />
+    <RecoilRoot>
+      <Router>
+        <div style={styles.container}>
+          {/* 네비게이션 바 */}
+          <TopNav />
 
-        {/* 라우트 설정 */}
-        <div style={styles.pageContent}>
+          {/* 라우트 설정 */}
+          <div style={styles.pageContent}>
+        
+            <Routes>
+              {/* 로그인 필요한 페이지 */}
+              <Route
+                      path="/report"
+                      element={
+                          <PrivateRoute>
+                              <Report />
+                          </PrivateRoute>
+                      }
+              />
+              <Route path="/" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:id" element={<Write />} />
+            
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/contact/result/" element={<YesorNo />} />
+              <Route path="/contact/report/" element={<Report />}/>
+              <Route path="/solution" element={<Solution />}/>
       
-          <Routes>
-            {/* 로그인 필요한 페이지 */}
-            <Route
-                    path="/report"
-                    element={
-                        <PrivateRoute>
-                            <Report />
-                        </PrivateRoute>
-                    }
-            />
-            <Route path="/" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:id" element={<Write />} />
-          
-            <Route path="/contact" element={<ContactUs />} />
-            <Route path="/contact/result/" element={<YesorNo />} />
-            <Route path="/contact/report/" element={<Report />}/>
-            <Route path="/solution" element={<Solution />}/>
-    
-          </Routes>
-       
+            </Routes>
+        
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </RecoilRoot>
   );
 }
 

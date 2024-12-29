@@ -93,7 +93,7 @@ const TopNav = () => {
                                 </Link>
                             ))}
                             <a
-                                href="https://www.instagram.com"
+                                href="https://www.instagram.com/exflu.adi/?igsh=YXhyZzQ0NzdycDZ6"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={styles.icon}

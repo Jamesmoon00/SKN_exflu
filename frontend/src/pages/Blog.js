@@ -10,27 +10,31 @@ const Blog = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // 모바일 여부
     const [showSideCard, setShowSideCard] = useState(true); // SideCard 표시 여부
     const navigate = useNavigate();
-
     useEffect(() => {
-        // 서버에서 데이터 가져오기
         const fetchPosts = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}blog/`); // 서버 API URL
-                // 최신글 순으로 정렬
-                const sortedPosts = response.data.sort(
-                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-                );
-
+                
+                // 최신순 정렬 (같은 날짜의 경우 작성 시간이 느린 순으로 정렬)
+                const sortedPosts = response.data.sort((a, b) => {
+                    const dateA = new Date(a.created_at);
+                    const dateB = new Date(b.created_at);
+    
+                    return dateB - dateA; // 최신순 정렬 (날짜 및 시간 포함)
+                });
+    
                 setPosts(sortedPosts); // 정렬된 데이터 상태에 저장
-                console.log(sortedPosts);
+                console.log(sortedPosts); // 정렬 확인
             } catch (error) {
                 console.error("데이터를 가져오는 중 오류 발생:", error);
             }
         };
-
+    
         fetchPosts();
     }, []); // 컴포넌트가 마운트될 때 한 번 실행
-
+    
+    
+    
     useEffect(() => {
         const handleResize = () => {
             setShowSideCard(window.innerWidth > 1000);

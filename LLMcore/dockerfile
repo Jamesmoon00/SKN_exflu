@@ -19,6 +19,9 @@ WORKDIR /app
 # Set PYTHONPATH for project root
 ENV PYTHONPATH=/app
 
+# pip 업그레이드
+RUN pip install --upgrade pip
+
 # 필요한 라이브러리 설치  
 RUN pip3 install -r ./requirements.txt
 

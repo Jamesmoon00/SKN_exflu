@@ -53,7 +53,7 @@ const FirstSection = () => {
                         fontSize: `${getFontSize(1)}rem`, // 동적으로 글자 크기 설정
                     }}
                 >
-                    This is a description. this is a description
+                    AI 인플루언서 마케팅 대행 웹 서비스
                 </p>
             </section>
         </div>

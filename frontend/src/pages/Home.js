@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import FirstSection from "../components/home/FirstSection";
-import SecondSection from "../components/home/SecondSection";
 import ThirdSection from "../components/home/ThirdSection";
 
 const Home = () => {
@@ -67,6 +66,7 @@ const styles = {
         width: "100%",
         height: "200vh", // 전체 높이 설정 (각 섹션 100vh씩 3배)
         overflowX: "hidden", // 가로 스크롤 방지
+        overflowY: "hidden", // 세로 스크롤 방지 (필요 시 추가)
     },
     section: {
         position: "sticky",
