@@ -9,8 +9,11 @@ def generate_ollama_exaone_service(payload: dict):
     Ollama 서버에 스트리밍 요청을 보내고 'response' 필드를 실시간으로 yield 합니다.
     """
     try:
-        response = requests.post(OLLAMA_API_URL, json=payload, stream=True)
-        
+        # timeout=(connect timeout, read timeout) 설정 추가
+        response = requests.post(OLLAMA_API_URL, 
+                            json=payload, 
+                            stream=True, 
+                            timeout=(20, 300))  # 연결 10초, 읽기 300초
         if 400 <= response.status_code < 600:
             yield json.dumps({"error": "Failed to fetch response from Ollama server"})
             return
